@@ -20,6 +20,9 @@ DIY Arduino intervalometer for a Cannon 5D camera
   - A total amount of time has passed
   - At a specified date & time
 
+# Timing
+![Timing Diagram](/Media/TimingDiagram.png)
+
 # Connections
 - 3.5mm output (for use with a 3.5mm -> Canon C3 cable)
 - Micro USB connector (for charging and firmware updates)
