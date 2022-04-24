@@ -1,4 +1,4 @@
-# arduino_intervalometer
+# DIY Intervalometer
 DIY Arduino intervalometer for a Cannon 5D camera
 
 # Features
