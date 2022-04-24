@@ -22,6 +22,9 @@ DIY Arduino intervalometer for a Cannon 5D camera
 
 # Timing
 ![Timing Diagram](/Media/TimingDiagram.png)
+**Notes**
+- Initial delay occurs after the start and date time. Set this to 0 in order to have the sequence start right away
+- The first focus will overlap with the initial delay in order to ensure that first exposure occurs on time.
 
 # Connections
 - 3.5mm output (for use with a 3.5mm -> Canon C3 cable)
