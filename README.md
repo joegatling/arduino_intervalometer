@@ -1,7 +1,7 @@
 # arduino_intervalometer
 DIY Arduino intervalometer for a Cannon 5D camera
 
-# Features (planned)
+# Features
 
 **General**
 - Shutter button
