@@ -4,8 +4,11 @@ DIY Arduino intervalometer for a Cannon 5D camera
 # Features (planned)
 
 **General**
-- Shutter button 
-- Screen for adjusting settings, seeing current status, etc... 
+- Shutter button
+- Focus button
+- Click wheel for adjusting settings
+- LCD screen
+- Ability to dim or disable screen and any LEDs for night shooting.
 
 **Interalometer**
 - Initial delay before first exposure
