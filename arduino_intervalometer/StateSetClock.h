@@ -3,10 +3,7 @@
 
 #include <RTCZero.h>
 #include <ctime>
-#include <SPI.h>
-#include <Wire.h>
 #include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
 #include <EncoderButton.h>
 
 #include "State.h"
@@ -39,10 +36,6 @@ class StateSetClock : public State
 
   private:
     static StateSetClock* instance;
-    
-    bool _redrawRequired = false;
-
-    Selectable* _currentSelectable;
 
     Selectable* _hourSelectable;
     Selectable* _minuteSelectable;

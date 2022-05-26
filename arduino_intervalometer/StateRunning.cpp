@@ -20,6 +20,13 @@ void StateRunning::Update()
   display->setCursor(0,0);             // Start at top-left corner
   
   sprintf(_clockString, "%02d:%02d", Controller::GetInstance()->GetRTC()->getHours(), Controller::GetInstance()->GetRTC()->getMinutes());
+  
+  int16_t  x1, y1;
+  uint16_t width, height;
+
+  display->getTextBounds(_clockString, 0, 0, &x1, &y1, &width, &height);
+
+  display->setCursor(SCREEN_WIDTH - width, 0);
   display->print(_clockString);
   display->display();
 }
@@ -31,4 +38,6 @@ void StateRunning::HandleEncoder(EncoderButton& eb)
 {}
 
 void StateRunning::HandleClick(EncoderButton& eb)
-{}
+{
+  Controller::GetInstance()->SetState(Controller::SET_CLOCK);  
+}

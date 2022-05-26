@@ -11,8 +11,10 @@ StateSetClock::StateSetClock()
   _minuteSelectable = new Selectable(32, 14, [](){ return StateSetClock::instance->GetClockMinutesText(); });
   _minuteSelectable->SetTextScale(2);
 
-  _saveSelectable = new Selectable(0, 36, "DONE");
-  _cancelSelectable = new Selectable(0, 46, "CANCEL");
+  _saveSelectable = new Selectable(0, SCREEN_HEIGHT - SELECTABLE_SPACING_1, "DONE");
+  _saveSelectable->SetAlignment(Selectable::BOTTOM_LEFT);
+  _cancelSelectable = new Selectable(0, SCREEN_HEIGHT, "CANCEL");
+  _cancelSelectable->SetAlignment(Selectable::BOTTOM_LEFT);
 
   //Connect them all together
   _hourSelectable->SetLinkedSelectables(NULL, _minuteSelectable);
@@ -20,44 +22,31 @@ StateSetClock::StateSetClock()
   _saveSelectable->SetLinkedSelectables(_minuteSelectable, _cancelSelectable);
   _cancelSelectable->SetLinkedSelectables(_saveSelectable, NULL);
 
-  _currentSelectable = _hourSelectable;
-  _currentSelectable->SetState(Selectable::FOCUSED);
+  AddSelectable(_hourSelectable);
+  AddSelectable(_minuteSelectable);
+  AddSelectable(_saveSelectable);
+  AddSelectable(_cancelSelectable);
+
+  SetCurrentSelectable(_hourSelectable);
 }
 
 void StateSetClock::Enter()
 {
   StateSetClock::instance = this;
 
-  if(_currentSelectable != _hourSelectable)
-  {
-    _currentSelectable->SetState(Selectable::NONE);
-    _currentSelectable = _hourSelectable;
-    _currentSelectable->SetState(Selectable::FOCUSED);
-  }
+  SetCurrentSelectable(_hourSelectable);
 
   _hours = Controller::GetInstance()->GetRTC()->getHours();
-  _minutes = Controller::GetInstance()->GetRTC()->getMinutes();
-
-  Controller::GetInstance()->GetKnob()->setEncoderHandler([](EncoderButton& eb) 
-  { 
-    StateSetClock::instance->HandleEncoder(eb);
-  });
-
-  Controller::GetInstance()->GetKnob()->setClickHandler([](EncoderButton& eb) 
-  {
-    StateSetClock::instance->HandleClick(eb);
-  });  
-
-  _redrawRequired = true; 
+  _minutes = Controller::GetInstance()->GetRTC()->getMinutes(); 
 }
 
 void StateSetClock::HandleEncoder(EncoderButton& eb)
 {  
   auto rtc = Controller::GetInstance()->GetRTC();
 
-  if(_currentSelectable->GetState() == Selectable::SELECTED)
+  if(GetCurrentSelectable()->GetState() == Selectable::SELECTED)
   {
-    if(_currentSelectable == _hourSelectable)
+    if(GetCurrentSelectable() == _hourSelectable)
     {
       _hours += eb.increment();
 
@@ -68,7 +57,7 @@ void StateSetClock::HandleEncoder(EncoderButton& eb)
 
       _hours = _hours % 24;
     }
-    else if(_currentSelectable == _minuteSelectable)
+    else if(GetCurrentSelectable() == _minuteSelectable)
     {
       _minutes += eb.increment();
 
@@ -82,57 +71,34 @@ void StateSetClock::HandleEncoder(EncoderButton& eb)
   }
   else
   {
-    if(eb.increment() > 0)
-    {
-      if(_currentSelectable->GetNextSelectable() != NULL)
-      {
-        _currentSelectable->SetState(Selectable::NONE);
-        _currentSelectable = _currentSelectable->GetNextSelectable();
-        _currentSelectable->SetState(Selectable::FOCUSED);
-    
-      }
-    }
-    else if(eb.increment() < 0)
-    {
-      if(_currentSelectable->GetPreviousSelectable() != NULL)
-      {
-        _currentSelectable->SetState(Selectable::NONE);
-        _currentSelectable = _currentSelectable->GetPreviousSelectable();
-        _currentSelectable->SetState(Selectable::FOCUSED);
-    
-      }      
-    }
-
+    IncrementCurrentSelectable(eb.increment());
   }
-  
-  _redrawRequired = true;
 }
 
 void StateSetClock::HandleClick(EncoderButton& eb)
 {
-  if(_currentSelectable != NULL)
+  if(GetCurrentSelectable() != NULL)
   {
-    if(_currentSelectable->GetState() == Selectable::SELECTED)
+    if(GetCurrentSelectable()->GetState() == Selectable::SELECTED)
     {
-      _currentSelectable->SetState(Selectable::FOCUSED);
+      GetCurrentSelectable()->SetState(Selectable::FOCUSED);
     }
     else
     {
-      if(_currentSelectable == _saveSelectable)
+      if(GetCurrentSelectable() == _saveSelectable)
       {
         Controller::GetInstance()->GetRTC()->setHours(_hours);
         Controller::GetInstance()->GetRTC()->setMinutes(_minutes);
 
-        Controller::GetInstance()->SetState(Controller::RUNNING);
+        Controller::GetInstance()->SetState(Controller::IDLE);
       }
-      else if(_currentSelectable == _cancelSelectable)
+      else if(GetCurrentSelectable() == _cancelSelectable)
       {
-        Controller::GetInstance()->SetState(Controller::RUNNING);
+        Controller::GetInstance()->SetState(Controller::IDLE);
       }
-      _currentSelectable->SetState(Selectable::SELECTED);
+
+      GetCurrentSelectable()->SetState(Selectable::SELECTED);
     }
-  
-    _redrawRequired = true;
   }
 
 
@@ -140,9 +106,8 @@ void StateSetClock::HandleClick(EncoderButton& eb)
 
 void StateSetClock::Update()
 {
-  if(_redrawRequired)
+  if(UpdateAllSelectables())
   {
-    _redrawRequired = false;    
     Adafruit_SSD1306* display = Controller::GetInstance()->GetDisplay();
 
     // TODO: Custom clock setting logic 
@@ -152,30 +117,21 @@ void StateSetClock::Update()
 
     display->setTextSize(1);             // Normal 1:1 pixel scale
     display->setCursor(2,0);             // Start at top-left corner
-    display->println(F("Set Clock"));  
+    display->println(F("CLOCK"));  
 
     display->setTextSize(2);             // Normal 1:1 pixel scale
     display->setCursor(24,16);             // Start at top-left corner
     display->println(F(":"));  
 
-
-    _hourSelectable->Update(display);
-    _minuteSelectable->Update(display);
-    _saveSelectable->Update(display);
-    _cancelSelectable->Update(display);
-
+    DrawAllSelectables(display);
+    
     display->display();
 
   }  
 }
 
 void StateSetClock::Exit()
-{
-
-
-  Controller::GetInstance()->GetKnob()->setClickHandler(NULL);
-  Controller::GetInstance()->GetKnob()->setEncoderHandler(NULL);  
-}
+{}
 
 char* StateSetClock::GetClockHoursText()
 {
