@@ -90,6 +90,7 @@ class Controller
       NONE = 0,
       IDLE,
       RUNNING,
+      SET_START_STYLE,
       SET_CLOCK,
       SET_TIME_INTERVAL,
       SET_DURATION,
@@ -97,7 +98,7 @@ class Controller
     };
 
     static Controller* GetInstance();    
-    static void Initialize(ProgramState initialState);
+    static void Initialize();
 
     void Update();
 
@@ -110,6 +111,11 @@ class Controller
     RTCZero* GetRTC();
     IntervalInfo* GetConfig();
 
+    bool Get24TimeFormat() { return _use24HourFormat; };
+    void Set24TimeFormat(bool use24HourFormat ) { _use24HourFormat = use24HourFormat; };
+
+    void GenerateTimeString(char* destination, uint8_t hours, uint8_t minutes);
+    void GenerateTimeString(char* destination);
 
   private:
     Controller();
@@ -128,6 +134,8 @@ class Controller
     Adafruit_SSD1306* _display;
     EncoderButton* _knob;
     RTCZero* _rtc;
+
+    bool _use24HourFormat = true;
 };
 
 

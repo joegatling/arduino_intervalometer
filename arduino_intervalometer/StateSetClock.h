@@ -14,6 +14,8 @@
 #define SPIN_TO_SAVE_SPEED 0.1f
 #define SPIN_TO_SAVE_TIMEOUT 500
 
+
+
 class StateSetClock : public State
 {  
   enum SetClockComponent
@@ -26,6 +28,7 @@ class StateSetClock : public State
 
   public:
     StateSetClock();
+    static StateSetClock* GetInstance() { return instance; }
 
     void Enter();
     void Update();
@@ -34,22 +37,49 @@ class StateSetClock : public State
     void HandleEncoder(EncoderButton& eb);
     void HandleClick(EncoderButton& eb);
 
+    void ShowTimeFormatOption(bool show);
+
+    uint8_t GetHours() { return _hours; }
+    uint8_t GetMinutes() { return _minutes; }
+
+    void SetTime(uint8_t hours, uint8_t minutes);
+    void SetTitle(const char* title);
+
+    void SetCompleteCallback(stateCompleteCallback callback);
+
+    void SetCanCancel(bool canCancel);
+    bool GetCanCancel();
+
   private:
     static StateSetClock* instance;
 
     Selectable* _hourSelectable;
     Selectable* _minuteSelectable;
+    Selectable* _amPmSelectable;
+    Selectable* _timeFormatSelectable;
     Selectable* _saveSelectable;
     Selectable* _cancelSelectable;
+
+    const char* _titleText;
 
     char _clockHoursText[3];
     char _clockMinutesText[3];
 
+    char _amPmText[3];
+
     uint8_t _hours = 0;
     uint8_t _minutes = 0;
 
+    uint8_t _originalHours = 0;
+    uint8_t _originalMinutes = 0;
+
+    //bool _canCancel = true;
+
     char* GetClockHoursText();
     char* GetClockMinutesText();
+    char* GetAmPmText();
+
+    stateCompleteCallback _onComplete;
 };
 
 #endif

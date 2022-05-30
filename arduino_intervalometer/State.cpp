@@ -37,7 +37,7 @@ Selectable* State::GetCurrentSelectable()
 
 void State::SetCurrentSelectable(Selectable* s, bool isSelected)
 {
-  if(s != _currentSelectable)
+  if(s != _currentSelectable && s->GetEnabled() == true)
   {
     if(_currentSelectable != NULL)
     {
@@ -62,25 +62,34 @@ void State::SetCurrentSelectable(Selectable* s, bool isSelected)
 
 Selectable* State::IncrementCurrentSelectable(int increment)
 {
+  Selectable* newSelectable = NULL;
+  
   if(increment > 0)
-  {
-    if(_currentSelectable->GetNextSelectable() != NULL)
+  {  
+    newSelectable = _currentSelectable->GetNextSelectable();
+
+    while(newSelectable != NULL && newSelectable->GetEnabled() == false && newSelectable != _currentSelectable)
     {
-      _currentSelectable->SetState(Selectable::NONE);
-      _currentSelectable = _currentSelectable->GetNextSelectable();
-      _currentSelectable->SetState(Selectable::FOCUSED);
-    }
+      newSelectable = newSelectable->GetNextSelectable();
+    }             
   }
   else if(increment < 0)
   {
-    if(_currentSelectable->GetPreviousSelectable() != NULL)
+    newSelectable = _currentSelectable->GetPreviousSelectable();
+
+    while(newSelectable != NULL && newSelectable->GetEnabled() == false && newSelectable != _currentSelectable)
     {
-      _currentSelectable->SetState(Selectable::NONE);
-      _currentSelectable = _currentSelectable->GetPreviousSelectable();
-      _currentSelectable->SetState(Selectable::FOCUSED);
-  
-    }      
+      newSelectable = newSelectable->GetPreviousSelectable();
+    } 
   }  
+
+  if(newSelectable != NULL)
+  {
+    
+    _currentSelectable->SetState(Selectable::NONE);
+    _currentSelectable = newSelectable;
+    _currentSelectable->SetState(Selectable::FOCUSED);
+  }
 
   return _currentSelectable;
 }

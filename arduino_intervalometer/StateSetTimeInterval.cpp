@@ -24,6 +24,7 @@ StateSetTimeInterval::StateSetTimeInterval()
   Selectable::LinkInSequence(_secondsSelectable);
   Selectable::LinkInSequence(_saveSelectable);
   Selectable::LinkInSequence(_cancelSelectable);
+  Selectable::EndSequence();
 
   AddSelectable(_hourSelectable);
   AddSelectable(_minuteSelectable);
@@ -144,13 +145,13 @@ void StateSetTimeInterval::Update()
     display->println(_titleText);  
     display->fillRect(0, 0, SCREEN_WIDTH, SELECTABLE_SPACING_1, SSD1306_INVERSE);
 
-    display->setCursor(_hourSelectable->GetPositionX() + _hourSelectable->GetWidth() + 1, _hourSelectable->GetPositionY() + 8);
+    display->setCursor(_hourSelectable->GetPositionX() + _hourSelectable->GetWidth() + 2, _hourSelectable->GetPositionY() + 8);
     display->println(F("HOUR"));  
 
-    display->setCursor(_minuteSelectable->GetPositionX() + _minuteSelectable->GetWidth() + 1, _minuteSelectable->GetPositionY() + 8);
+    display->setCursor(_minuteSelectable->GetPositionX() + _minuteSelectable->GetWidth() + 2, _minuteSelectable->GetPositionY() + 8);
     display->println(F("MIN"));  
 
-    display->setCursor(_secondsSelectable->GetPositionX() + _secondsSelectable->GetWidth() + 1, _secondsSelectable->GetPositionY() + 8);
+    display->setCursor(_secondsSelectable->GetPositionX() + _secondsSelectable->GetWidth() + 2, _secondsSelectable->GetPositionY() + 8);
     display->println(F("SEC"));  
 
     DrawAllSelectables(display);

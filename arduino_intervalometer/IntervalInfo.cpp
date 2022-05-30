@@ -1,6 +1,7 @@
 #include <cstdio>
 
 #include "IntervalInfo.h"
+#include "Controller.h"
 
 #define MAX_EXPOSURE_COUNT 10000
 
@@ -9,11 +10,17 @@ IntervalInfo::IntervalInfo()
   _intervalSeconds = 10;
 }
 
-void IntervalInfo::SetInitialDelay(uint8_t hours, uint8_t minutes, uint8_t seconds)
+void IntervalInfo::SetStartDelay(uint8_t hours, uint8_t minutes, uint8_t seconds)
 {
-  _initialDelayHours = hours;
-  _initialDelayMinutes = minutes;
-  _initialDelaySeconds = seconds;
+  _startDelayHours = hours;
+  _startDelayMinutes = minutes;
+  _startDelaySeconds = seconds;
+}
+
+void IntervalInfo::SetStartTime(uint8_t hours, uint8_t minutes)
+{
+  _startTimeHours = hours;
+  _startTimeMinutes = minutes;
 }
 
 void IntervalInfo::SetShutter(uint8_t hours, uint8_t minutes, uint8_t seconds)
@@ -22,7 +29,6 @@ void IntervalInfo::SetShutter(uint8_t hours, uint8_t minutes, uint8_t seconds)
   _shutterMinutes = minutes;
   _shutterSeconds = seconds;
 }
-
 
 void IntervalInfo::SetInterval(uint8_t hours, uint8_t minutes, uint8_t seconds)
 {
@@ -56,14 +62,23 @@ void IntervalInfo::SetExposureCount(int count)
     _exposureCount += MAX_EXPOSURE_COUNT;
   }
 
-
   _exposureCount = _exposureCount % MAX_EXPOSURE_COUNT;
 }
     
-
-void IntervalInfo::GenerateInitialDelayString(char* destination)
+void IntervalInfo::GenerateStartDelayString(char* destination)
 {
-  GenerateTimeString(destination, _initialDelayHours, _initialDelayMinutes, _initialDelaySeconds);
+  if(_sessionStartStyle == IntervalInfo::IMMEDIATELY)
+  {
+    sprintf(destination, "-");
+  }
+  else if(_sessionStartStyle == IntervalInfo::AFTER_DELAY)
+  {
+    GenerateTimeString(destination, _startDelayHours, _startDelayMinutes, _startDelaySeconds);
+  }
+  else
+  {
+    Controller::GetInstance()->GenerateTimeString(destination, _startTimeHours, _startTimeMinutes);
+  }
 }
 
 void IntervalInfo::GenerateShutterString(char* destination)

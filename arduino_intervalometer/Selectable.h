@@ -63,6 +63,7 @@ class Selectable
     void SetState(State newState);
 
     bool GetRedrawRequired();
+    void RequireRedraw() { _redrawRequired = true; } 
 
     Alignment GetAlignment();
     void SetAlignment(Alignment alignment);

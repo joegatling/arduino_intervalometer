@@ -1,10 +1,12 @@
 #include "Controller.h"
 
+#include "State.h"
 #include "StateSetClock.h"
 #include "StateRunning.h"
 #include "StateIdle.h"
 #include "StateSetTimeInterval.h"
 #include "StateSetDuration.h"
+#include "StateSetStartStyle.h"
 
 #define SCREEN_ADDRESS 0x3C
 #define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
@@ -31,10 +33,6 @@ Controller::Controller()
   #else
     _display = new Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
   #endif
-
-  // _display->ssd1306_command(SSD1306_SETCONTRAST);
-  // _display->ssd1306_command(32);
-  
   
   if(!_display->begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) 
   {
@@ -73,11 +71,13 @@ Controller::Controller()
   {
     _states[i] = NULL;
   }
+
   _states[Controller::SET_CLOCK] = new StateSetClock();
   _states[Controller::RUNNING] = new StateRunning();
   _states[Controller::IDLE] = new StateIdle();
   _states[Controller::SET_TIME_INTERVAL] = new StateSetTimeInterval();
   _states[Controller::SET_DURATION] = new StateSetDuration();
+  _states[Controller::SET_START_STYLE] = new StateSetStartStyle();
 
 
   _display->println("States OK...");
@@ -87,9 +87,26 @@ Controller::Controller()
   _currentProgramState = NONE;
 }
 
-void Controller::Initialize(Controller::ProgramState initialState)
+void Controller::Initialize()
 {
-  GetInstance()->SetState(initialState);
+  GetInstance();
+
+  StateSetClock::GetInstance()->SetCompleteCallback([](bool didCancel)
+  {
+    Controller::GetInstance()->GetRTC()->setHours(StateSetClock::GetInstance()->GetHours());
+    Controller::GetInstance()->GetRTC()->setMinutes(StateSetClock::GetInstance()->GetMinutes());
+
+    Controller::GetInstance()->SetState(Controller::IDLE);                                             
+  });
+
+  StateSetClock::GetInstance()->SetTitle("CLOCK");
+  StateSetClock::GetInstance()->SetTime(Controller::GetInstance()->GetRTC()->getHours(), 
+                                        Controller::GetInstance()->GetRTC()->getMinutes());
+  StateSetClock::GetInstance()->SetCanCancel(false);
+
+  Controller::GetInstance()->SetState(Controller::SET_TIME_INTERVAL);  
+
+  GetInstance()->SetState(SET_CLOCK);
 }
 
 void Controller::Update()
@@ -155,3 +172,32 @@ EncoderButton* Controller::GetKnob() { return _knob; }
 RTCZero*  Controller::GetRTC() { return _rtc; }
 
 IntervalInfo*  Controller::GetConfig() { return &_config; }
+
+
+void Controller::GenerateTimeString(char* destination, uint8_t hours, uint8_t minutes)
+{
+
+  if(!_use24HourFormat)
+  {
+    int hoursToShow = hours;
+    if(hours == 0 || hours == 12)
+    {
+      hoursToShow = 12;
+    }
+    else
+    {
+      hoursToShow = hours % 12;
+    }
+
+    sprintf(destination, "%d:%02d%s", hoursToShow, minutes, hours < 12 ? "am" : "pm");
+  }
+  else
+  {
+    sprintf(destination, "%02d:%02d", hours, minutes);
+  }   
+}
+
+void Controller::GenerateTimeString(char* destination)
+{
+  GenerateTimeString(destination, GetRTC()->getHours(), GetRTC()->getMinutes());
+}

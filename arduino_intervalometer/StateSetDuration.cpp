@@ -38,19 +38,6 @@ void StateSetDuration::Enter()
                                                 Controller::GetInstance()->GetConfig()->GetDurationMinutes(),  
                                                 Controller::GetInstance()->GetConfig()->GetDurationSeconds());
 
-  // if(GetCurrentSelectable() == _shutterSettingsSelectable)
-  // {
-  //   Controller::GetInstance()->GetConfig()->SetShutter(StateSetTimeInterval::GetInstance()->GetHours(),
-  //                                                     StateSetTimeInterval::GetInstance()->GetMinutes(),
-  //                                                     StateSetTimeInterval::GetInstance()->GetSeconds());
-  // }
-  // else if(GetCurrentSelectable() == _intervalSettingsSelectable)
-  // {
-  //   Controller::GetInstance()->GetConfig()->SetInterval(StateSetTimeInterval::GetInstance()->GetHours(),
-  //                                                     StateSetTimeInterval::GetInstance()->GetMinutes(),
-  //                                                     StateSetTimeInterval::GetInstance()->GetSeconds());
-  // }  
-
   RearrangeSelectables();  
   _redrawRequired = true;
 }
@@ -104,50 +91,17 @@ void StateSetDuration::HandleClick(EncoderButton& eb)
   {
     Controller::GetInstance()->GetConfig()->SetSessionEndStyle(IntervalInfo::TOTAL_DURATION);
     RearrangeSelectables();
-    
-
-    // StateSetTimeInterval::GetInstance()->SetCompleteCallback([](bool didCancel)
-    // {
-    //   if(!didCancel)
-    //   {    
-    //     Controller::GetInstance()->GetConfig()->SetDuration(StateSetTimeInterval::GetInstance()->GetHours(),
-    //                                                       StateSetTimeInterval::GetInstance()->GetMinutes(),
-    //                                                       StateSetTimeInterval::GetInstance()->GetSeconds());
-
-    //     Controller::GetInstance()->SetState(Controller::IDLE);                                             
-    //   }
-    //   else
-    //   {
-    //     Controller::GetInstance()->SetState(Controller::SET_DURATION);
-    //   }
-    // });
-
-    // StateSetTimeInterval::GetInstance()->SetTitle("DURATION");
-    // StateSetTimeInterval::GetInstance()->SetTime(Controller::GetInstance()->GetConfig()->GetDurationHours(), 
-    //                                             Controller::GetInstance()->GetConfig()->GetDurationMinutes(),  
-    //                                             Controller::GetInstance()->GetConfig()->GetDurationSeconds());
-
-    // Controller::GetInstance()->SetState(Controller::SET_TIME_INTERVAL);                                        
+                                       
   }
   else if(GetCurrentSelectable() == _endTimeSelectable)
   {
     Controller::GetInstance()->GetConfig()->SetSessionEndStyle(IntervalInfo::DATE_TIME);
     RearrangeSelectables();
-    // StateSetTimeInterval::GetInstance()->SetTitle("INTERVAL");
-    // StateSetTimeInterval::GetInstance()->SetTime(Controller::GetInstance()->GetConfig()->GetIntervalHours(), 
-    //                                              Controller::GetInstance()->GetConfig()->GetIntervalMinutes(),  
-    //                                              Controller::GetInstance()->GetConfig()->GetIntervalSeconds());
-    // Controller::GetInstance()->SetState(Controller::SET_TIME_INTERVAL);                                           
   } 
   else if(GetCurrentSelectable() == _noEndSelectable)
   {
     Controller::GetInstance()->GetConfig()->SetSessionEndStyle(IntervalInfo::NO_END);
     RearrangeSelectables();
-    // StateSetTimeInterval::GetInstance()->SetTitle("INTERVAL");
-    // StateSetTimeInterval::GetInstance()->SetTime(Controller::GetInstance()->GetConfig()->GetIntervalHours(), 
-    //                                              Controller::GetInstance()->GetConfig()->GetIntervalMinutes(),  
-    //                                              Controller::GetInstance()->GetConfig()->GetIntervalSeconds());
-    // Controller::GetInstance()->SetState(Controller::SET_TIME_INTERVAL);                                           
   }     
   else
   {
@@ -159,8 +113,6 @@ void StateSetDuration::RearrangeSelectables()
 {
   int offset = Y_OFFSET;
   IntervalInfo::SessionEndStyle endStyle = Controller::GetInstance()->GetConfig()->GetSessionEndStyle();
-  //auto endStyle = 
-
   Selectable::EndSequence();
 
   _exposureCountSelectable->SetPosition(ICON_WIDTH + 2, offset);

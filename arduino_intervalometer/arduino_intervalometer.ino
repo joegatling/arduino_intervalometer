@@ -10,7 +10,7 @@
 
 void setup() 
 {
-  Controller::Initialize(Controller::SET_CLOCK);
+  Controller::Initialize();
 
   Adafruit_SSD1306* display = Controller::GetInstance()->GetDisplay();
   display->println("Setup Complete");

@@ -9,6 +9,9 @@
 
 #define MAX_SELECTABLES 16
 
+  typedef void (*stateCompleteCallback)(bool);
+
+
 class State 
 {
   public:

@@ -9,8 +9,6 @@
 #include "State.h"
 #include "Selectable.h"
 
-typedef void (*stateCompleteCallback)(bool);
-
 class StateSetTimeInterval : public State
 {  
   public:

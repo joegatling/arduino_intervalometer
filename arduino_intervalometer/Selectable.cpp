@@ -83,7 +83,7 @@ bool Selectable::Update()
     }
   }
 
-  return _redrawRequired && _enabled;
+  return _redrawRequired;
 }
 
 void Selectable::Draw(Adafruit_GFX* display)

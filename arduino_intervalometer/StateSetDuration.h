@@ -42,8 +42,6 @@ class StateSetDuration : public State
 
     static char __durationString[MAX_TIME_STRING_LENGTH];
     static char* GetDurationString();
-
-
 };
 
 #endif

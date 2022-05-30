@@ -3,13 +3,22 @@
 
 StateSetClock* StateSetClock::instance = NULL;
 
+#define Y_OFFSET 24
+
 StateSetClock::StateSetClock()
 {
-  _hourSelectable = new Selectable(0, 14, [](){ return StateSetClock::instance->GetClockHoursText(); });
+  StateSetClock::instance = this;
+
+  _hourSelectable = new Selectable(0, Y_OFFSET, [](){ return StateSetClock::instance->GetClockHoursText(); });
   _hourSelectable->SetTextScale(2);
 
-  _minuteSelectable = new Selectable(32, 14, [](){ return StateSetClock::instance->GetClockMinutesText(); });
+  _minuteSelectable = new Selectable(32, Y_OFFSET, [](){ return StateSetClock::instance->GetClockMinutesText(); });
   _minuteSelectable->SetTextScale(2);
+
+  _amPmSelectable = new Selectable(42, Y_OFFSET + SELECTABLE_SPACING_2, [](){ return StateSetClock::GetInstance()->GetAmPmText(); });
+
+  _timeFormatSelectable = new Selectable(ICON_WIDTH + 2, SCREEN_HEIGHT - SELECTABLE_SPACING_1*3, "24h");
+  _timeFormatSelectable->SetAlignment(Selectable::BOTTOM_LEFT);
 
   _saveSelectable = new Selectable(0, SCREEN_HEIGHT - SELECTABLE_SPACING_1, "DONE");
   _saveSelectable->SetAlignment(Selectable::BOTTOM_LEFT);
@@ -17,33 +26,36 @@ StateSetClock::StateSetClock()
   _cancelSelectable->SetAlignment(Selectable::BOTTOM_LEFT);
 
   //Connect them all together
-  _hourSelectable->SetLinkedSelectables(NULL, _minuteSelectable);
-  _minuteSelectable->SetLinkedSelectables(_hourSelectable, _saveSelectable);
-  _saveSelectable->SetLinkedSelectables(_minuteSelectable, _cancelSelectable);
-  _cancelSelectable->SetLinkedSelectables(_saveSelectable, NULL);
+  Selectable::LinkInSequence(_hourSelectable);
+  Selectable::LinkInSequence(_minuteSelectable);
+  Selectable::LinkInSequence(_amPmSelectable);
+  Selectable::LinkInSequence(_timeFormatSelectable);
+  Selectable::LinkInSequence(_saveSelectable);
+  Selectable::LinkInSequence(_cancelSelectable);
+  Selectable::EndSequence();
 
   AddSelectable(_hourSelectable);
   AddSelectable(_minuteSelectable);
   AddSelectable(_saveSelectable);
   AddSelectable(_cancelSelectable);
+  AddSelectable(_timeFormatSelectable);
+  AddSelectable(_amPmSelectable);
 
   SetCurrentSelectable(_hourSelectable);
 }
 
 void StateSetClock::Enter()
 {
-  StateSetClock::instance = this;
+  _amPmSelectable->SetEnabled(Controller::GetInstance()->Get24TimeFormat() == false);
 
   SetCurrentSelectable(_hourSelectable);
 
-  _hours = Controller::GetInstance()->GetRTC()->getHours();
-  _minutes = Controller::GetInstance()->GetRTC()->getMinutes(); 
+  _originalHours = _hours;
+  _originalMinutes = _minutes;
 }
 
 void StateSetClock::HandleEncoder(EncoderButton& eb)
 {  
-  auto rtc = Controller::GetInstance()->GetRTC();
-
   if(GetCurrentSelectable()->GetState() == Selectable::SELECTED)
   {
     if(GetCurrentSelectable() == _hourSelectable)
@@ -87,17 +99,34 @@ void StateSetClock::HandleClick(EncoderButton& eb)
     {
       if(GetCurrentSelectable() == _saveSelectable)
       {
-        Controller::GetInstance()->GetRTC()->setHours(_hours);
-        Controller::GetInstance()->GetRTC()->setMinutes(_minutes);
-
-        Controller::GetInstance()->SetState(Controller::IDLE);
+        if(_onComplete != NULL)
+        {
+          _onComplete(false);
+        }
       }
       else if(GetCurrentSelectable() == _cancelSelectable)
       {
-        Controller::GetInstance()->SetState(Controller::IDLE);
-      }
+        _hours = _originalHours;
+        _minutes = _originalMinutes;
 
-      GetCurrentSelectable()->SetState(Selectable::SELECTED);
+        if(_onComplete != NULL)
+        {
+          _onComplete(true);
+        }
+      }
+      else if(GetCurrentSelectable() == _timeFormatSelectable)
+      {
+        Controller::GetInstance()->Set24TimeFormat(!Controller::GetInstance()->Get24TimeFormat());
+        _amPmSelectable->SetEnabled(Controller::GetInstance()->Get24TimeFormat() == false);
+      }
+      else if(GetCurrentSelectable() == _amPmSelectable)
+      {
+        _hours = (_hours + 12) % 24;
+      }      
+      else
+      {
+        GetCurrentSelectable()->SetState(Selectable::SELECTED);
+      }
     }
   }
 
@@ -116,14 +145,22 @@ void StateSetClock::Update()
     display->setTextColor(SSD1306_WHITE);        // Draw white text
 
     display->setTextSize(1);             // Normal 1:1 pixel scale
-    display->setCursor(2,0);             // Start at top-left corner
-    display->println(F("CLOCK"));  
+    display->setCursor(2,2);             // Start at top-left corner
+    display->println(_titleText);  
 
     display->setTextSize(2);             // Normal 1:1 pixel scale
-    display->setCursor(24,16);             // Start at top-left corner
+    display->setCursor(24,_hourSelectable->GetPositionY()+2);             // Start at top-left corner
     display->println(F(":"));  
 
     DrawAllSelectables(display);
+
+
+    if(_timeFormatSelectable->GetEnabled())
+    {
+      display->drawBitmap(0, _timeFormatSelectable->GetPositionY() - _timeFormatSelectable->GetHeight(), Controller::GetInstance()->Get24TimeFormat() ? icon_true : icon_false, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
+    }
+
+    display->fillRect(0, 0, SCREEN_WIDTH, SELECTABLE_SPACING_1, SSD1306_INVERSE);
     
     display->display();
 
@@ -135,7 +172,21 @@ void StateSetClock::Exit()
 
 char* StateSetClock::GetClockHoursText()
 {
-  sprintf(_clockHoursText, "%02d", _hours);
+  if(Controller::GetInstance()->Get24TimeFormat())
+  {
+    sprintf(_clockHoursText, "%02d", _hours);
+  }
+  else
+  {
+    if(_hours == 0 || _hours == 12)
+    {
+      sprintf(_clockHoursText, "12");
+    }
+    else
+    {
+      sprintf(_clockHoursText, "%2d", _hours % 12);
+    }
+  }
   return _clockHoursText;
 }
 
@@ -144,3 +195,50 @@ char* StateSetClock::GetClockMinutesText()
   sprintf(_clockMinutesText, "%02d", _minutes);
   return _clockMinutesText;  
 }
+
+char* StateSetClock::GetAmPmText()
+{
+  if(_hours < 12)
+  {
+    sprintf(_amPmText, "AM");
+  }
+  else
+  {
+    sprintf(_amPmText, "PM");
+  }
+  return _amPmText;  
+}
+
+
+void StateSetClock::ShowTimeFormatOption(bool show)
+{
+  _timeFormatSelectable->SetEnabled(show);
+}
+
+void StateSetClock::SetTime(uint8_t hours, uint8_t minutes)
+{
+  _hours = hours;
+  _minutes = minutes;
+}
+
+void StateSetClock::SetTitle(const char* title)
+{
+  _titleText = title;
+}
+
+void StateSetClock::SetCanCancel(bool canCancel)
+{
+  _cancelSelectable->SetEnabled(canCancel);
+}
+
+bool StateSetClock::GetCanCancel()
+{
+  return _cancelSelectable->GetEnabled();
+}
+
+
+void StateSetClock::SetCompleteCallback(stateCompleteCallback onComplete)
+{
+  _onComplete = onComplete;
+}
+

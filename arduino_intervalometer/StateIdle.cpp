@@ -46,6 +46,7 @@ StateIdle::StateIdle()
   Selectable::LinkInSequence(_intervalSettingsSelectable);
   Selectable::LinkInSequence(_endSettingsSelectable);
   Selectable::LinkInSequence(_beginSelectable);
+  Selectable::EndSequence();
 
   AddSelectable(_beginSelectable);
   AddSelectable(_setClockSelectable);
@@ -60,28 +61,6 @@ StateIdle::StateIdle()
 
 void StateIdle::Enter()
 {
-  // if(GetCurrentSelectable() == _shutterSettingsSelectable)
-  // {
-  //   Controller::GetInstance()->GetConfig()->SetShutter(StateSetTimeInterval::GetInstance()->GetHours(),
-  //                                                     StateSetTimeInterval::GetInstance()->GetMinutes(),
-  //                                                     StateSetTimeInterval::GetInstance()->GetSeconds());
-  // }
-  // else if(GetCurrentSelectable() == _intervalSettingsSelectable)
-  // {
-  //   Controller::GetInstance()->GetConfig()->SetInterval(StateSetTimeInterval::GetInstance()->GetHours(),
-  //                                                     StateSetTimeInterval::GetInstance()->GetMinutes(),
-  //                                                     StateSetTimeInterval::GetInstance()->GetSeconds());
-  // }  
-  // else if(GetCurrentSelectable() == _endSettingsSelectable)
-  // {
-  //   if(Controller::GetInstance()->GetConfig()->GetSessionEndStyle() == IntervalInfo::TOTAL_DURATION)
-  //   {
-  //     Controller::GetInstance()->GetConfig()->SetDuration(StateSetTimeInterval::GetInstance()->GetHours(),
-  //                                                       StateSetTimeInterval::GetInstance()->GetMinutes(),
-  //                                                       StateSetTimeInterval::GetInstance()->GetSeconds());
-  //   }
-  // }
-
   _redrawRequired = true;
 }
 
@@ -119,10 +98,6 @@ void StateIdle::HandleEncoder(EncoderButton& eb)
   if(_endSettingsSelectable->GetState() == Selectable::SELECTED)
   {
     int16_t increment = eb.increment()*eb.increment()*eb.increment();
-    // if(eb.increment() < 0)
-    // {
-    //   increment = -increment;      
-    // }
     Controller::GetInstance()->GetConfig()->SetExposureCount(Controller::GetInstance()->GetConfig()->GetExposureCount() + increment);
   }
   else
@@ -192,17 +167,21 @@ void StateIdle::HandleClick(EncoderButton& eb)
       //_endSettingsSelectable->SetTextScale(2);
     }
   }
+  else if(GetCurrentSelectable() == _startSettingsSelectable)
+  {
+    Controller::GetInstance()->SetState(Controller::SET_START_STYLE); 
+  }
 }
 
 char* StateIdle::GetClockString()
 {
-  sprintf(__clockString, "%02d:%02d", Controller::GetInstance()->GetRTC()->getHours(), Controller::GetInstance()->GetRTC()->getMinutes());
+  Controller::GetInstance()->GenerateTimeString(__clockString);
   return __clockString;  
 }
 
 char* StateIdle::GetDelayString()
 {
-  Controller::GetInstance()->GetConfig()->GenerateInitialDelayString(__delayString);
+  Controller::GetInstance()->GetConfig()->GenerateStartDelayString(__delayString);
   return __delayString;    
 }
 
