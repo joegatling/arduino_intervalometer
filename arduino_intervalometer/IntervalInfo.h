@@ -17,7 +17,6 @@ class IntervalInfo
   public: 
     enum SessionStartStyle
     {
-      IMMEDIATELY,
       AT_TIME,
       AFTER_DELAY
     };
@@ -32,7 +31,7 @@ class IntervalInfo
 
     IntervalInfo();
 
-    uint32_t GetTotalStartDelay() { return (_startDelayHours * 3600) + (_startDelayMinutes * 60) + _startDelaySeconds; };
+    unsigned long GetTotalStartDelayMillis() { return ((_startDelayHours * 3600) + (_startDelayMinutes * 60) + _startDelaySeconds) * 1000; };
 
     uint8_t GetStartDelaySeconds() { return _startDelaySeconds; };
     uint8_t GetStartDelayMinutes() { return _startDelayMinutes; };
@@ -43,21 +42,21 @@ class IntervalInfo
     uint8_t GetStartTimeMinutes() { return _startTimeMinutes; };
     void SetStartTime(uint8_t hours, uint8_t minutes);
     
-    uint32_t GetTotalShutter() { return (_shutterHours * 3600) + (_shutterMinutes * 60) + _shutterSeconds; };
+    unsigned long  GetTotalShutterMillis() { return ((_shutterHours * 3600) + (_shutterMinutes * 60) + _shutterSeconds) * 1000; };
 
     uint8_t GetShutterSeconds() { return _shutterSeconds; };
     uint8_t GetShutterMinutes() { return _shutterMinutes; };
     uint8_t GetShutterHours() { return _shutterHours; };
     void SetShutter(uint8_t hours, uint8_t minutes, uint8_t seconds);
     
-    uint32_t GetTotalInterval() { return (_intervalHours * 3600) + (_intervalMinutes * 60) + _intervalSeconds; };
+    unsigned long  GetTotalIntervalMillis() { return ((_intervalHours * 3600) + (_intervalMinutes * 60) + _intervalSeconds) * 1000; };
 
     uint8_t GetIntervalSeconds() { return _intervalSeconds; };
     uint8_t GetIntervalMinutes() { return _intervalMinutes; };
     uint8_t GetIntervalHours() { return _intervalHours; };
     void SetInterval(uint8_t hours, uint8_t minutes, uint8_t seconds);
 
-    uint32_t GetTotalDuration() { return (_durationHours * 3600) + (_durationMinutes * 60) + _durationSeconds; };
+    unsigned long  GetTotalDurationMillis() { return ((_durationHours * 3600) + (_durationMinutes * 60) + _durationSeconds) * 1000; };
 
     uint8_t GetDurationSeconds() { return _durationSeconds; };
     uint8_t GetDurationMinutes() { return _durationMinutes; };
@@ -79,13 +78,14 @@ class IntervalInfo
     //float GetTotalDuration() { return _sessionEndStyle == TOTAL_DURATION ? _totalDuration : 0; };
     time_t GetEndDateTime() { return _endDateTime; };
 
-    void GenerateStartDelayString(char* destination);
+    void GenerateStartDelayString(char* destination, bool showZero = false);
     void GenerateShutterString(char* destination);
     void GenerateIntervalString(char* destination);
     void GenerateDurationString(char* destination);
 
+    void GenerateTimeString(char* destination, uint8_t hours, uint8_t minutes, uint8_t seconds, bool showZero = false);
+
   private:
-    void GenerateTimeString(char* destination, uint8_t hours, uint8_t minutes, uint8_t seconds);
 
     uint8_t _startTimeHours = 0;
     uint8_t _startTimeMinutes = 0;
@@ -102,7 +102,7 @@ class IntervalInfo
     uint8_t _intervalMinutes = 0;
     uint8_t _intervalHours = 0;
 
-    SessionStartStyle _sessionStartStyle = IMMEDIATELY;
+    SessionStartStyle _sessionStartStyle = AFTER_DELAY;
     SessionEndStyle _sessionEndStyle = TOTAL_EXPOSURE_COUNT;
 
     int _exposureCount = 10;

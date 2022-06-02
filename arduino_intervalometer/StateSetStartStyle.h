@@ -26,7 +26,6 @@ class StateSetStartStyle : public State
     void HandleClick(EncoderButton& eb);
 
   private:
-    Selectable* _immediateSelectable;
     Selectable* _timeSelectable;
     Selectable* _delaySelectable;
 

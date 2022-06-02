@@ -1,13 +1,14 @@
 #include "StateIdle.h"
 #include "StateSetTimeInterval.h"
 #include "Controller.h"
+#include "StateSetClock.h"
 
 // 'Left Icons', 9x55px
 
 // #define ICONS_WIDTH 9
 // #define ICONS_HEIGHT 55
 
-#define SETTINGS_Y_OFFSET 24
+#define Y_OFFSET 24
 
 
 char StateIdle::__clockString[] = "\0";
@@ -25,19 +26,19 @@ StateIdle::StateIdle()
   _beginSelectable->SetAlignment(Selectable::BOTTOM_RIGHT);
   _beginSelectable->SetTextScale(3);
 
-  _setClockSelectable = new Selectable(SCREEN_WIDTH, 0, GetClockString);
+  _setClockSelectable = new Selectable(SCREEN_WIDTH-1, 1, GetClockString);
   _setClockSelectable->SetAlignment(Selectable::TOP_RIGHT);
 
-  _startSettingsSelectable = new Selectable(ICON_WIDTH + 2, SETTINGS_Y_OFFSET, GetDelayString);
+  _startSettingsSelectable = new Selectable(ICON_WIDTH + 2, Y_OFFSET, GetDelayString);
   _startSettingsSelectable->SetAlignment(Selectable::TOP_LEFT);
 
-  _shutterSettingsSelectable = new Selectable(ICON_WIDTH + 2, SETTINGS_Y_OFFSET + SELECTABLE_SPACING_1 * 1, GetShutterString);
+  _shutterSettingsSelectable = new Selectable(ICON_WIDTH + 2, Y_OFFSET + SELECTABLE_SPACING_1 * 1, GetShutterString);
   _shutterSettingsSelectable->SetAlignment(Selectable::TOP_LEFT);
 
-  _intervalSettingsSelectable = new Selectable(ICON_WIDTH + 2, SETTINGS_Y_OFFSET + SELECTABLE_SPACING_1 * 2, GetIntervalString);
+  _intervalSettingsSelectable = new Selectable(ICON_WIDTH + 2, Y_OFFSET + SELECTABLE_SPACING_1 * 2, GetIntervalString);
   _intervalSettingsSelectable->SetAlignment(Selectable::TOP_LEFT);
 
-  _endSettingsSelectable = new Selectable(ICON_WIDTH + 2, SETTINGS_Y_OFFSET + SELECTABLE_SPACING_1 * 3, GetDurationString);
+  _endSettingsSelectable = new Selectable(ICON_WIDTH + 2, Y_OFFSET + SELECTABLE_SPACING_1 * 3, GetDurationString);
   _endSettingsSelectable->SetAlignment(Selectable::TOP_LEFT);
 
   Selectable::LinkInSequence(_setClockSelectable);
@@ -49,7 +50,6 @@ StateIdle::StateIdle()
   Selectable::EndSequence();
 
   AddSelectable(_beginSelectable);
-  AddSelectable(_setClockSelectable);
   AddSelectable(_setClockSelectable);
   AddSelectable(_shutterSettingsSelectable);
   AddSelectable(_intervalSettingsSelectable);
@@ -79,10 +79,10 @@ void StateIdle::Update()
 
     DrawAllSelectables(display);
 
-    display->drawBitmap(0, SETTINGS_Y_OFFSET, icon_start, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
-    display->drawBitmap(0, SETTINGS_Y_OFFSET + SELECTABLE_SPACING_1, icon_shutter, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
-    display->drawBitmap(0, SETTINGS_Y_OFFSET + SELECTABLE_SPACING_1*2, icon_interval, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
-    display->drawBitmap(0, SETTINGS_Y_OFFSET + SELECTABLE_SPACING_1*3, icon_count, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
+    display->drawBitmap(0, Y_OFFSET, icon_start, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
+    display->drawBitmap(0, Y_OFFSET + SELECTABLE_SPACING_1, icon_shutter, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
+    display->drawBitmap(0, Y_OFFSET + SELECTABLE_SPACING_1*2, icon_interval, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
+    display->drawBitmap(0, Y_OFFSET + SELECTABLE_SPACING_1*3, icon_count, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
 
     display->fillRect(0, 0, SCREEN_WIDTH, SELECTABLE_SPACING_1, SSD1306_INVERSE);
 
@@ -110,7 +110,23 @@ void StateIdle::HandleClick(EncoderButton& eb)
 {
   if(GetCurrentSelectable() == _setClockSelectable)
   {
-    Controller::GetInstance()->SetState(Controller::SET_CLOCK);  
+    StateSetClock::GetInstance()->SetCompleteCallback([](bool didCancel)
+    {
+      if(!didCancel)
+      {
+        Controller::GetInstance()->GetRTC()->setHours(StateSetClock::GetInstance()->GetHours());
+        Controller::GetInstance()->GetRTC()->setMinutes(StateSetClock::GetInstance()->GetMinutes());
+      }
+
+      Controller::GetInstance()->SetState(Controller::IDLE);                                             
+    });
+
+    StateSetClock::GetInstance()->SetTitle("SET CLOCK");
+    StateSetClock::GetInstance()->SetTime(Controller::GetInstance()->GetRTC()->getHours(), 
+                                          Controller::GetInstance()->GetRTC()->getMinutes());
+    StateSetClock::GetInstance()->SetCanCancel(true);
+
+    Controller::GetInstance()->SetState(Controller::SET_CLOCK);
   }
   else if(GetCurrentSelectable() == _shutterSettingsSelectable)
   {
@@ -170,6 +186,10 @@ void StateIdle::HandleClick(EncoderButton& eb)
   else if(GetCurrentSelectable() == _startSettingsSelectable)
   {
     Controller::GetInstance()->SetState(Controller::SET_START_STYLE); 
+  }
+  else if(GetCurrentSelectable() == _beginSelectable)
+  {
+    Controller::GetInstance()->SetState(Controller::RUNNING);
   }
 }
 

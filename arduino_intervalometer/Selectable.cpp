@@ -81,6 +81,11 @@ bool Selectable::Update()
         _redrawRequired = true;
       }    
     }
+
+    if(_flashStartTime > 0 && millis() < (_flashStartTime + FLASH_LENGTH * 2))
+    {
+      _redrawRequired = true;
+    }
   }
 
   return _redrawRequired;
@@ -120,13 +125,17 @@ void Selectable::Draw(Adafruit_GFX* display)
     display->setCursor(localX+2,localY+2);  
     display->print(_label);
 
-    if(_state == Selectable::FOCUSED)
-    {
-      display->drawRect(localX,localY,_width,_height,SSD1306_WHITE);
+    if(millis() < (_flashStartTime + FLASH_LENGTH))
+    {      
+      display->fillRect(localX-1,localY-1,_width+1,_height+1,SSD1306_INVERSE);
     }
     else if(_state == Selectable::SELECTED)
     {
       display->fillRect(localX,localY,_width,_height,SSD1306_INVERSE);
+    }
+    else if(_state == Selectable::FOCUSED)
+    {
+      display->drawRect(localX,localY,_width,_height,SSD1306_WHITE);
     }
 
     _redrawRequired = false;

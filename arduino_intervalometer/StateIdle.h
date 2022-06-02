@@ -35,6 +35,7 @@ class StateIdle : public State
 
     Selectable* _beginSelectable;
     Selectable* _setClockSelectable;
+    
     Selectable* _intervalSettingsSelectable;
     Selectable* _startSettingsSelectable;
     Selectable* _endSettingsSelectable;

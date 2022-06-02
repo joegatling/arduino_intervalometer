@@ -8,9 +8,14 @@ typedef char* (*dynamicLabelCallback)(void);
 
 #define MAX_LABEL_LENGTH 32
 
-#define SELECTABLE_SPACING_1 11
-#define SELECTABLE_SPACING_2 19
-#define SELECTABLE_SPACING_3 27
+#define SELECTABLE_SPACING_1 13
+#define SELECTABLE_SPACING_2 21
+#define SELECTABLE_SPACING_3 29
+// #define SELECTABLE_SPACING_1 11
+// #define SELECTABLE_SPACING_2 19
+// #define SELECTABLE_SPACING_3 27
+
+#define FLASH_LENGTH 100
 
 class Selectable
 {
@@ -71,6 +76,8 @@ class Selectable
     bool GetEnabled() { return _enabled; }
     void SetEnabled(bool enabled) { _enabled = enabled; _redrawRequired = true; }
 
+    void Flash() { _flashStartTime = millis();}
+
     static void LinkInSequence(Selectable* selectable);
     static void EndSequence();
     static void LoopLinkSequence();
@@ -99,6 +106,8 @@ class Selectable
     static Selectable* __sequencePrevious;
 
     static char __tempLabel[MAX_LABEL_LENGTH];
+
+    unsigned long _flashStartTime = 0;
 
 };
 

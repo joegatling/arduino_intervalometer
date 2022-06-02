@@ -39,8 +39,8 @@ class StateSetClock : public State
 
     void ShowTimeFormatOption(bool show);
 
-    uint8_t GetHours() { return _hours; }
-    uint8_t GetMinutes() { return _minutes; }
+    uint8_t GetHours() { return (uint8_t)_hours; }
+    uint8_t GetMinutes() { return (uint8_t)_minutes; }
 
     void SetTime(uint8_t hours, uint8_t minutes);
     void SetTitle(const char* title);
@@ -67,11 +67,11 @@ class StateSetClock : public State
 
     char _amPmText[3];
 
-    uint8_t _hours = 0;
-    uint8_t _minutes = 0;
+    int _hours = 0;
+    int _minutes = 0;
 
-    uint8_t _originalHours = 0;
-    uint8_t _originalMinutes = 0;
+    int _originalHours = 0;
+    int _originalMinutes = 0;
 
     //bool _canCancel = true;
 

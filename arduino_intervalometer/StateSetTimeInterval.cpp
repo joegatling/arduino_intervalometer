@@ -43,6 +43,8 @@ void StateSetTimeInterval::Enter()
   _originalMinutes = _minutes;
   _originalSeconds = _seconds;
 
+  _redrawRequired = true;
+
   SetCurrentSelectable(_secondsSelectable);
 }
 
@@ -132,7 +134,7 @@ void StateSetTimeInterval::HandleClick(EncoderButton& eb)
 
 void StateSetTimeInterval::Update()
 {
-  if(UpdateAllSelectables())
+  if(UpdateAllSelectables() || _redrawRequired )
   {
     Adafruit_SSD1306* display = Controller::GetInstance()->GetDisplay();
 
@@ -141,7 +143,7 @@ void StateSetTimeInterval::Update()
     display->setTextColor(SSD1306_WHITE);  
 
     display->setTextSize(1);             
-    display->setCursor(2,2);             
+    display->setCursor(2,3);             
     display->println(_titleText);  
     display->fillRect(0, 0, SCREEN_WIDTH, SELECTABLE_SPACING_1, SSD1306_INVERSE);
 
@@ -157,6 +159,8 @@ void StateSetTimeInterval::Update()
     DrawAllSelectables(display);
     
     display->display();
+
+    _redrawRequired = false;
 
   }  
 }

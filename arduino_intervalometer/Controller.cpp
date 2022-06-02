@@ -46,7 +46,7 @@ Controller::Controller()
   _display->setTextSize(1); 
 
   #ifdef ROTATE_DISPLAY        
-    _display->setRotation(1); 
+    _display->setRotation(3); 
   #endif
 
   _display->println("LCD OK...");
@@ -106,7 +106,7 @@ void Controller::Initialize()
 
   Controller::GetInstance()->SetState(Controller::SET_TIME_INTERVAL);  
 
-  GetInstance()->SetState(SET_CLOCK);
+  GetInstance()->SetState(Controller::SET_CLOCK);
 }
 
 void Controller::Update()

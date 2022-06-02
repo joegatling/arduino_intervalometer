@@ -75,7 +75,7 @@ void StateSetClock::HandleEncoder(EncoderButton& eb)
 
       while(_minutes < 0)
       {
-        _minutes += 24;
+        _minutes += 60;
       }
 
       _minutes = _minutes % 60;
@@ -118,10 +118,12 @@ void StateSetClock::HandleClick(EncoderButton& eb)
       {
         Controller::GetInstance()->Set24TimeFormat(!Controller::GetInstance()->Get24TimeFormat());
         _amPmSelectable->SetEnabled(Controller::GetInstance()->Get24TimeFormat() == false);
+        _timeFormatSelectable->Flash();
       }
       else if(GetCurrentSelectable() == _amPmSelectable)
       {
         _hours = (_hours + 12) % 24;
+        _amPmSelectable->Flash();
       }      
       else
       {
@@ -145,7 +147,7 @@ void StateSetClock::Update()
     display->setTextColor(SSD1306_WHITE);        // Draw white text
 
     display->setTextSize(1);             // Normal 1:1 pixel scale
-    display->setCursor(2,2);             // Start at top-left corner
+    display->setCursor(2,3);             // Start at top-left corner
     display->println(_titleText);  
 
     display->setTextSize(2);             // Normal 1:1 pixel scale
@@ -153,7 +155,6 @@ void StateSetClock::Update()
     display->println(F(":"));  
 
     DrawAllSelectables(display);
-
 
     if(_timeFormatSelectable->GetEnabled())
     {

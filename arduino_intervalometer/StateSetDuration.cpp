@@ -53,7 +53,7 @@ void StateSetDuration::Update()
     display->setTextColor(SSD1306_WHITE);  
 
     display->setTextSize(1);    
-    display->setCursor(2,2);    
+    display->setCursor(2,3);    
     display->println(F("END")); 
 
     DrawAllSelectables(display);

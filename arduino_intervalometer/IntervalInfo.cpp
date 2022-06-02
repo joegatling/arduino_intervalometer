@@ -36,7 +36,7 @@ void IntervalInfo::SetInterval(uint8_t hours, uint8_t minutes, uint8_t seconds)
   _intervalMinutes = minutes;
   _intervalSeconds = seconds;
 
-  if(GetTotalInterval() == 0)
+  if(GetTotalIntervalMillis() == 0)
   {
     _intervalSeconds = 1;
   }
@@ -65,15 +65,18 @@ void IntervalInfo::SetExposureCount(int count)
   _exposureCount = _exposureCount % MAX_EXPOSURE_COUNT;
 }
     
-void IntervalInfo::GenerateStartDelayString(char* destination)
+void IntervalInfo::GenerateStartDelayString(char* destination, bool showZero)
 {
-  if(_sessionStartStyle == IntervalInfo::IMMEDIATELY)
+  if(_sessionStartStyle == IntervalInfo::AFTER_DELAY)
   {
-    sprintf(destination, "-");
-  }
-  else if(_sessionStartStyle == IntervalInfo::AFTER_DELAY)
-  {
-    GenerateTimeString(destination, _startDelayHours, _startDelayMinutes, _startDelaySeconds);
+    if(showZero == false && GetTotalStartDelayMillis() == 0)
+    {
+      sprintf(destination, "-");
+    }
+    else
+    {
+      GenerateTimeString(destination, _startDelayHours, _startDelayMinutes, _startDelaySeconds, showZero);
+    }
   }
   else
   {
@@ -109,11 +112,11 @@ void IntervalInfo::GenerateDurationString(char* destination)
   }  
 }
 
-void IntervalInfo::GenerateTimeString(char* destination, uint8_t hours, uint8_t minutes, uint8_t seconds)
+void IntervalInfo::GenerateTimeString(char* destination, uint8_t hours, uint8_t minutes, uint8_t seconds, bool showZero)
 {
   if(hours > 0)
   {
-    if(seconds > 0)
+    if(showZero || seconds > 0)
     {
       sprintf(destination, "%dh%02dm%02ds", hours, minutes, seconds);
     }
@@ -128,7 +131,7 @@ void IntervalInfo::GenerateTimeString(char* destination, uint8_t hours, uint8_t 
   }
   else if(minutes > 0)
   {
-    if(seconds > 0)
+    if(showZero || seconds > 0)
     {
       sprintf(destination, "%dm%02ds", minutes, seconds);
     }
@@ -137,7 +140,7 @@ void IntervalInfo::GenerateTimeString(char* destination, uint8_t hours, uint8_t 
       sprintf(destination, "%dm", minutes);
     }
   } 
-  else if(seconds > 0)
+  else if(showZero || seconds > 0)
   {
       sprintf(destination, "%ds", seconds);
   } 

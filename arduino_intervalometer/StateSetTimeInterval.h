@@ -60,6 +60,8 @@ class StateSetTimeInterval : public State
     char* GetMinutesText();
     char* GetSecondsText();
 
+    bool _redrawRequired = false;
+
     stateCompleteCallback _onComplete;
 };
 

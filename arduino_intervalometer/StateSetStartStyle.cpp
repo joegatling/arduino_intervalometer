@@ -7,20 +7,20 @@
 
 StateSetStartStyle::StateSetStartStyle()
 {
- // _immediateSelectable = new Selectable(ICON_WIDTH + 2,Y_OFFSET, "");
+
   _timeSelectable = new Selectable(ICON_WIDTH + 2,Y_OFFSET, "AT TIME");
   _delaySelectable = new Selectable(ICON_WIDTH + 2,Y_OFFSET + SELECTABLE_SPACING_1, "DELAY");
 
   _cancelSelectable = new Selectable(0, SCREEN_HEIGHT, "CANCEL");
   _cancelSelectable->SetAlignment(Selectable::BOTTOM_LEFT);
 
-  //Selectable::LinkInSequence(_immediateSelectable);
+
   Selectable::LinkInSequence(_timeSelectable);
   Selectable::LinkInSequence(_delaySelectable);
   Selectable::LinkInSequence(_cancelSelectable);
   Selectable::EndSequence();
 
-  //AddSelectable(_immediateSelectable);
+
   AddSelectable(_timeSelectable);
   AddSelectable(_delaySelectable);
   AddSelectable(_cancelSelectable);
@@ -35,10 +35,6 @@ void StateSetStartStyle::Enter()
   if(config->GetSessionStartStyle() == IntervalInfo::AT_TIME)
   {
     SetCurrentSelectable(_timeSelectable);
-  }
-  else if(config->GetSessionStartStyle() == IntervalInfo::IMMEDIATELY)
-  {
-    SetCurrentSelectable(_immediateSelectable);
   }
   else
   {
@@ -59,7 +55,7 @@ void StateSetStartStyle::Update()
     display->setTextColor(SSD1306_WHITE);  
 
     display->setTextSize(1);    
-    display->setCursor(2,2);    
+    display->setCursor(2,3);    
     display->println(F("START")); 
 
     DrawAllSelectables(display);
