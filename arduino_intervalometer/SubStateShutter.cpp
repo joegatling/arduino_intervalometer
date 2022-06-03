@@ -12,6 +12,8 @@ SubStateShutter::SubStateShutter()
 void SubStateShutter::Enter()
 {
   //TODO Trigger Shutter Pin
+  Controller::GetInstance()->SetFocus(true);
+  Controller::GetInstance()->SetShutter(true);
 }
 
 void SubStateShutter::Update()
@@ -56,6 +58,9 @@ void SubStateShutter::Exit()
   config->GenerateShutterString(_displayString);
 
   //TODO Untrigger Shutter Pin
+  Controller::GetInstance()->SetShutter(false);
+  Controller::GetInstance()->SetFocus(false);
+
 }
 
 char* SubStateShutter::GetDisplayString(bool force)

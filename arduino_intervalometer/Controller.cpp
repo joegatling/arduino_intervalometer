@@ -15,6 +15,9 @@
 #define ENCODER_B_PIN 6
 #define ENCODER_BUTTON_PIN 10
 
+#define SHUTTER_PIN 11
+#define FOCUS_PIN 12
+
 Controller* Controller::_instance = NULL;
 Controller* Controller::GetInstance()
 {
@@ -40,31 +43,35 @@ Controller::Controller()
     while(true) {}; // Don't proceed, loop forever
   }
   
-  _display->clearDisplay();
-  _display->setCursor(0,0);            
-  _display->setTextColor(SSD1306_WHITE); 
-  _display->setTextSize(1); 
+
+  // _display->setCursor(0,0);            
+  // _display->setTextColor(SSD1306_WHITE); 
+  // _display->setTextSize(1); 
 
   #ifdef ROTATE_DISPLAY        
     _display->setRotation(3); 
   #endif
 
-  _display->println("LCD OK...");
+  _display->clearDisplay();
+  _display->drawBitmap(SCREEN_WIDTH / 2 - BOOT_LOGO_WIDTH/2, SCREEN_HEIGHT / 2 - BOOT_LOGO_HEIGHT / 2,  boot_logo, BOOT_LOGO_WIDTH, BOOT_LOGO_HEIGHT, SSD1306_WHITE);
   _display->display();
+
+  // _display->println("LCD OK...");
+  // _display->display();
   
   _knob = new EncoderButton(ENCODER_A_PIN, ENCODER_B_PIN, ENCODER_BUTTON_PIN);
   _knob->setEncoderHandler(HandleEncoder);
   _knob->setClickHandler(HandleClick);    
 
-  _display->println("Knob OK...");
-  _display->display();
+  // _display->println("Knob OK...");
+  // _display->display();
 
 
   _rtc = new RTCZero();
   _rtc->begin();
 
-  _display->println("RTC OK...");
-  _display->display();
+  // _display->println("RTC OK...");
+  // _display->display();
 
   // Initialise _states
   for(int i = 0; i < Controller::STATE_COUNT; i++)
@@ -80,8 +87,14 @@ Controller::Controller()
   _states[Controller::SET_START_STYLE] = new StateSetStartStyle();
 
 
-  _display->println("States OK...");
-  _display->display();
+  // _display->println("States OK...");
+  // _display->display();
+
+  pinMode(SHUTTER_PIN, OUTPUT);
+  digitalWrite(SHUTTER_PIN, HIGH);
+
+  pinMode(FOCUS_PIN, INPUT_PULLUP);
+  digitalWrite(FOCUS_PIN, HIGH);
 
   _nextProgramState = UNSET;
   _currentProgramState = NONE;
@@ -172,6 +185,17 @@ EncoderButton* Controller::GetKnob() { return _knob; }
 RTCZero*  Controller::GetRTC() { return _rtc; }
 
 IntervalInfo*  Controller::GetConfig() { return &_config; }
+
+void Controller::SetShutter(bool isPressed)
+{
+  digitalWrite(SHUTTER_PIN, isPressed ? LOW : HIGH);
+}
+
+void Controller::SetFocus(bool isPressed)
+{
+  digitalWrite(FOCUS_PIN, isPressed ? LOW : HIGH);
+}
+
 
 
 void Controller::GenerateTimeString(char* destination, uint8_t hours, uint8_t minutes)

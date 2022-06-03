@@ -12,10 +12,10 @@ void setup()
 {
   Controller::Initialize();
 
-  Adafruit_SSD1306* display = Controller::GetInstance()->GetDisplay();
-  display->println("Setup Complete");
-  display->display();
-  delay(200);
+  // Adafruit_SSD1306* display = Controller::GetInstance()->GetDisplay();
+  // display->println("Setup Complete");
+  // display->display();
+  delay(2000);
 }
 
 void loop() 

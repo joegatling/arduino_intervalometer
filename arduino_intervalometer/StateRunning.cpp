@@ -154,10 +154,11 @@ void StateRunning::UpdateUnlock(Adafruit_GFX* display)
 {
   if(!_isUnlocking)
   {
-    if(millis() - _lastUnlockMillis > 200)
+    if(millis() - _lastUnlockMillis > 500)
     {
       _wobbleX = 0;
       _wobbleY = 0;
+      _redrawRequired = true;
     }
 
     if(_wobbleX != 0 || _wobbleY != 0)
