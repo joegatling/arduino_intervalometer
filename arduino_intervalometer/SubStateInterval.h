@@ -15,8 +15,16 @@ class SubStateInterval: public SubState
 
     char* GetDisplayString(bool force);
 
+    void SetIsComplete(bool isComplete) { _isComplete = isComplete; }
+    bool GetIsComplete() { return _isComplete; };
+    
+    static void OnAlarm();
+
   private:
     static char _displayString[MAX_TIME_STRING_LENGTH];
+
+    bool _isComplete = false;
+
 };
 
 #endif

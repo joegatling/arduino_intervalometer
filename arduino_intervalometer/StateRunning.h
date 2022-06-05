@@ -32,7 +32,7 @@ class StateRunning : public State
     StateRunning();
 
     void Enter();
-    void Update();
+    void Update(bool forceRedraw);
     void Exit();
 
     void HandleEncoder(EncoderButton& eb);
@@ -79,7 +79,6 @@ class StateRunning : public State
 
     int _wobbleX = 0;
     int _wobbleY = 0;
-
 
     static char* GetDelayString();
     static char* GetShutterString();

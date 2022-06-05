@@ -19,7 +19,7 @@ class StateIdle : public State
     StateIdle();
 
     void Enter();
-    void Update();
+    void Update(bool forceRedraw);
     void Exit();
 
     void HandleEncoder(EncoderButton& eb);
@@ -49,7 +49,6 @@ class StateIdle : public State
     static char* GetClockString();
 
     bool _redrawRequired;
-
 };
 
 #endif

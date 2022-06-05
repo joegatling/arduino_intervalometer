@@ -14,9 +14,17 @@ class SubStateShutter: public SubState
     virtual void Exit();
 
     char* GetDisplayString(bool force);
+    static void OnAlarm();
+
+    void SetIsComplete(bool isComplete) { _isComplete = isComplete; }
+    bool GetIsComplete() { return _isComplete; };
+
 
   private:
     static char _displayString[MAX_TIME_STRING_LENGTH];
+    bool _isComplete = false;
+    bool _isBlinking = false;
+
 };
 
 #endif

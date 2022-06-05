@@ -17,7 +17,7 @@ class StateSetTimeInterval : public State
     StateSetTimeInterval();
 
     void Enter();
-    void Update();
+    void Update(bool forceRedraw);
     void Exit();
 
     void HandleEncoder(EncoderButton& eb);

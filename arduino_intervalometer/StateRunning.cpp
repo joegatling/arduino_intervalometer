@@ -5,6 +5,7 @@
 #include "SubStateShutter.h"
 #include "SubStateInterval.h"
 #include "SubStateFinished.h"
+#include "StateMessage.h"
 
 #define Y_OFFSET 24
 
@@ -85,10 +86,15 @@ void StateRunning::Enter()
 
   _exposureCount = 0;
   __refreshAllText = true;
+
+  //digitalWrite(LED_RED_PIN, HIGH);
 }
 
-void StateRunning::Update()
+void StateRunning::Update(bool forceRedraw)
 {
+
+  _redrawRequired |= forceRedraw;
+
   if(UpdateAllSelectables() || _redrawRequired || _isUnlocking)
   {
     Adafruit_SSD1306* display = Controller::GetInstance()->GetDisplay();
@@ -116,7 +122,9 @@ void StateRunning::Update()
 }
 
 void StateRunning::Exit()
-{}
+{
+  //digitalWrite(LED_RED_PIN, LOW);
+}
 
 void StateRunning::HandleEncoder(EncoderButton& eb)
 {
@@ -191,7 +199,14 @@ void StateRunning::UpdateUnlock(Adafruit_GFX* display)
 
     if(_currentIconX >= SCREEN_WIDTH - UNLOCK_ICON_WIDTH)
     {    
-      Controller::GetInstance()->SetState(Controller::IDLE);
+      auto messageState = StateMessage::GetInstance();
+      messageState->SetMessage("Session Cancelled", 2000);
+      messageState->SetCompleteCallback([](bool didCancel)
+      {      
+        Controller::GetInstance()->SetState(Controller::IDLE);                                             
+      });
+
+      Controller::GetInstance()->SetState(Controller::MESSAGE);
     }
 
     display->drawRect(2, SCREEN_HEIGHT - 9, SCREEN_WIDTH - 4, 7, SSD1306_WHITE);

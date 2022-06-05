@@ -52,6 +52,7 @@ void StateSetClock::Enter()
 
   _originalHours = _hours;
   _originalMinutes = _minutes;
+
 }
 
 void StateSetClock::HandleEncoder(EncoderButton& eb)
@@ -135,9 +136,10 @@ void StateSetClock::HandleClick(EncoderButton& eb)
 
 }
 
-void StateSetClock::Update()
+void StateSetClock::Update(bool forceRedraw)
 {
-  if(UpdateAllSelectables())
+
+  if(UpdateAllSelectables() || forceRedraw)
   {
     Adafruit_SSD1306* display = Controller::GetInstance()->GetDisplay();
 

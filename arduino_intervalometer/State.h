@@ -16,7 +16,7 @@ class State
 {
   public:
     virtual void Enter() = 0;
-    virtual void Update() = 0;
+    virtual void Update(bool forceRedraw) = 0;
     virtual void Exit() = 0;
 
     virtual void HandleEncoder(EncoderButton &eb) = 0;

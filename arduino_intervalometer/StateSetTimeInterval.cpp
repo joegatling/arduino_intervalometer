@@ -132,8 +132,10 @@ void StateSetTimeInterval::HandleClick(EncoderButton& eb)
 
 }
 
-void StateSetTimeInterval::Update()
+void StateSetTimeInterval::Update(bool forceRedraw)
 {
+  _redrawRequired |= forceRedraw;
+  
   if(UpdateAllSelectables() || _redrawRequired )
   {
     Adafruit_SSD1306* display = Controller::GetInstance()->GetDisplay();

@@ -9,12 +9,15 @@
 #include <Adafruit_SSD1306.h>
 #include <EncoderButton.h>
 
+
 #include "State.h"
 #include "IntervalInfo.h"
 
 #define SCREEN_WIDTH 64 // OLED display width, in pixels
 #define SCREEN_HEIGHT 128 // OLED display height, in pixels
 #define ROTATE_DISPLAY
+
+#define LED_RED_PIN 13
 
 #define ICON_WIDTH 7
 #define ICON_HEIGHT 11
@@ -24,6 +27,8 @@
 
 #define BOOT_LOGO_WIDTH 58
 #define BOOT_LOGO_HEIGHT 54
+
+#define SLEEP_TIMEOUT 5000 //300000
 
 
 // 'end', 7x11px
@@ -100,15 +105,6 @@ const unsigned char boot_logo [] PROGMEM = {
 	0x3f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc0, 0x3f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc0
 };
 
-// // Array of all bitmaps for convenience. (Total bytes used to store images in PROGMEM = 192)
-// const int icon_allArray_LEN = 4;
-// const unsigned char* icon_allArray[4] = {
-// 	icon_end,
-// 	icon_interval,
-// 	icon_shutter,
-// 	icon_start
-// };
-
 class Controller 
 {
   public:
@@ -122,11 +118,14 @@ class Controller
       SET_CLOCK,
       SET_TIME_INTERVAL,
       SET_DURATION,
+      MESSAGE,
       STATE_COUNT
     };
 
     static Controller* GetInstance();    
     static void Initialize();
+
+    static void WakeInterrupt();
 
     void Update();
 
@@ -145,16 +144,44 @@ class Controller
     bool Get24TimeFormat() { return _use24HourFormat; };
     void Set24TimeFormat(bool use24HourFormat ) { _use24HourFormat = use24HourFormat; };
 
-    void GenerateTimeString(char* destination, uint8_t hours, uint8_t minutes);
+    void GenerateTimeString(char* destination, uint8_t hours, uint8_t minutes, uint8_t seconds = 0);
     void GenerateTimeString(char* destination);
 
+    unsigned long GetMillisSinceLastInput() { return millis() - _lastInputTime; };
+    void ResetLastInputMillis() { _lastInputTime = millis(); }; 
+
+    unsigned long GetMillisSinceWakeUp() { return millis() - _wakeUpTime; };
+    unsigned long GetMillisInCurrentState() { return millis() - _stateEnterTime; };
+
+    bool GetIsAsleep() { return _isAsleep; };
+    void Sleep();
+    void WakeUp(bool isUserInput);
+
+    void SetDisplayState(bool isOn);
+    bool GetDisplayState() { return _isDisplayOn; };
+
+    void SetLedToSleepState() { digitalWrite(LED_RED_PIN, _isDisplayOn ? LOW : HIGH); };
+
+    void SetOverrideLedState(bool isOn);
+    void ClearOverrideLedState();
+
   private:
+    enum LedOverrideState
+    {
+      NO_OVERRIDE,
+      OVERRIDE_ON,
+      OVERRIDE_OFF
+    };
+
     Controller();
 
     static void HandleEncoder(EncoderButton& eb);
     static void HandleClick(EncoderButton& eb); 
 
+
+
     static Controller* _instance;
+    static volatile bool _discardInterrupts;
 
     IntervalInfo _config;
 
@@ -166,7 +193,19 @@ class Controller
     EncoderButton* _knob;
     RTCZero* _rtc;
 
+    volatile unsigned long _lastInputTime = 0;
+    volatile unsigned long _wakeUpTime = 0;
+    volatile bool _isAsleep = false;
+    volatile bool _isDisplayOn = true;
+
+    unsigned long _stateEnterTime = 0;
+    
+    bool _redrawRequired = false;
     bool _use24HourFormat = true;
+
+    LedOverrideState _ledOverride = NO_OVERRIDE;
+
+    void UpdateLedState();
 };
 
 

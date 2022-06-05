@@ -19,7 +19,7 @@ class StateSetDuration : public State
     StateSetDuration();
 
     void Enter();
-    void Update();
+    void Update(bool forceRedraw);
     void Exit();
 
     void HandleEncoder(EncoderButton& eb);

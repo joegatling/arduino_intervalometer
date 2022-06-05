@@ -31,7 +31,7 @@ class StateSetClock : public State
     static StateSetClock* GetInstance() { return instance; }
 
     void Enter();
-    void Update();
+    void Update(bool forceRedraw);
     void Exit();
 
     void HandleEncoder(EncoderButton& eb);
@@ -78,7 +78,7 @@ class StateSetClock : public State
     char* GetClockHoursText();
     char* GetClockMinutesText();
     char* GetAmPmText();
-
+    
     stateCompleteCallback _onComplete;
 };
 

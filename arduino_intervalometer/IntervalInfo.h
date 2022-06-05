@@ -90,11 +90,11 @@ class IntervalInfo
     uint8_t _startTimeHours = 0;
     uint8_t _startTimeMinutes = 0;
 
-    uint8_t _startDelaySeconds = 0;
+    uint8_t _startDelaySeconds = 5;
     uint8_t _startDelayMinutes = 0;
     uint8_t _startDelayHours = 0;
     
-    uint8_t _shutterSeconds = 0;
+    uint8_t _shutterSeconds = 10;
     uint8_t _shutterMinutes = 0;
     uint8_t _shutterHours = 0;
 

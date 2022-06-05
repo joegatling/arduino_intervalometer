@@ -44,8 +44,9 @@ void StateSetStartStyle::Enter()
   _redrawRequired = true;
 }
 
-void StateSetStartStyle::Update()
+void StateSetStartStyle::Update(bool forceRedraw)
 {
+  _redrawRequired |= forceRedraw;
   if(UpdateAllSelectables() || _redrawRequired)
   {
     _redrawRequired = false;

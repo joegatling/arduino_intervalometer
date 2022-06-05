@@ -64,8 +64,10 @@ void StateIdle::Enter()
   _redrawRequired = true;
 }
 
-void StateIdle::Update()
+void StateIdle::Update(bool forceRedraw)
 {
+  _redrawRequired |= forceRedraw;
+
   if(UpdateAllSelectables() || _redrawRequired)
   {
     _redrawRequired = false;
@@ -191,6 +193,7 @@ void StateIdle::HandleClick(EncoderButton& eb)
   {
     Controller::GetInstance()->SetState(Controller::RUNNING);
   }
+  
 }
 
 char* StateIdle::GetClockString()

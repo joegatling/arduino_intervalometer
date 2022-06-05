@@ -42,8 +42,9 @@ void StateSetDuration::Enter()
   _redrawRequired = true;
 }
 
-void StateSetDuration::Update()
+void StateSetDuration::Update(bool forceRedraw)
 {
+  _redrawRequired |= forceRedraw;
   if(UpdateAllSelectables() || _redrawRequired)
   {
     _redrawRequired = false;
