@@ -28,7 +28,7 @@
 #define BOOT_LOGO_WIDTH 58
 #define BOOT_LOGO_HEIGHT 54
 
-#define SLEEP_TIMEOUT 5000 //300000
+#define SLEEP_TIMEOUT 300000
 
 
 // 'end', 7x11px
