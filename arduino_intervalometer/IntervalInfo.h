@@ -12,6 +12,30 @@
 // Interval - The length of time between two exposures in the session
 // Duration - the length of time of the session before it end
 
+typedef struct
+{
+  bool isValid = false;
+
+  uint8_t startTimeHours;
+  uint8_t startTimeMinutes;
+
+  uint8_t startDelaySeconds;
+  uint8_t startDelayMinutes;
+  uint8_t startDelayHours;
+  
+  uint8_t shutterSeconds;
+  uint8_t shutterMinutes;
+  uint8_t shutterHours;
+
+  uint8_t intervalSeconds;
+  uint8_t intervalMinutes;
+  uint8_t intervalHours;
+
+  uint8_t sessionStartStyle;
+
+  int16_t exposureCount;
+} IntervalometerSaveData;
+
 class IntervalInfo
 {
   public: 
@@ -21,62 +45,63 @@ class IntervalInfo
       AFTER_DELAY
     };
 
-    enum SessionEndStyle
-    {
-      NO_END = 0,
-      TOTAL_EXPOSURE_COUNT,
-      TOTAL_DURATION,
-      DATE_TIME
-    };
+    // enum SessionEndStyle
+    // {
+    //   NO_END = 0,
+    //   TOTAL_EXPOSURE_COUNT,
+    //   TOTAL_DURATION,
+    //   DATE_TIME
+    // };
 
     IntervalInfo();
 
-    unsigned long GetTotalStartDelayMillis() { return ((_startDelayHours * 3600) + (_startDelayMinutes * 60) + _startDelaySeconds) * 1000; };
+    unsigned long GetTotalStartDelayMillis() { return ((_data.startDelayHours * 3600) + (_data.startDelayMinutes * 60) + _data.startDelaySeconds) * 1000; };
 
-    uint8_t GetStartDelaySeconds() { return _startDelaySeconds; };
-    uint8_t GetStartDelayMinutes() { return _startDelayMinutes; };
-    uint8_t GetStartDelayHours() { return _startDelayHours; };
+    uint8_t GetStartDelaySeconds() { return _data.startDelaySeconds; };
+    uint8_t GetStartDelayMinutes() { return _data.startDelayMinutes; };
+    uint8_t GetStartDelayHours() { return _data.startDelayHours; };
     void SetStartDelay(uint8_t hours, uint8_t minutes, uint8_t seconds);
 
-    uint8_t GetStartTimeHours() { return _startTimeHours; };
-    uint8_t GetStartTimeMinutes() { return _startTimeMinutes; };
+    uint8_t GetStartTimeHours() { return _data.startTimeHours; };
+    uint8_t GetStartTimeMinutes() { return _data.startTimeMinutes; };
     void SetStartTime(uint8_t hours, uint8_t minutes);
     
-    unsigned long  GetTotalShutterMillis() { return ((_shutterHours * 3600) + (_shutterMinutes * 60) + _shutterSeconds) * 1000; };
+    unsigned long  GetTotalShutterMillis() { return ((_data.shutterHours * 3600) + (_data.shutterMinutes * 60) + _data.shutterSeconds) * 1000; };
 
-    uint8_t GetShutterSeconds() { return _shutterSeconds; };
-    uint8_t GetShutterMinutes() { return _shutterMinutes; };
-    uint8_t GetShutterHours() { return _shutterHours; };
+    uint8_t GetShutterSeconds() { return _data.shutterSeconds; };
+    uint8_t GetShutterMinutes() { return _data.shutterMinutes; };
+    uint8_t GetShutterHours() { return _data.shutterHours; };
     void SetShutter(uint8_t hours, uint8_t minutes, uint8_t seconds);
     
-    unsigned long  GetTotalIntervalMillis() { return ((_intervalHours * 3600) + (_intervalMinutes * 60) + _intervalSeconds) * 1000; };
+    unsigned long  GetTotalIntervalMillis() { return ((_data.intervalHours * 3600) + (_data.intervalMinutes * 60) + _data.intervalSeconds) * 1000; };
 
-    uint8_t GetIntervalSeconds() { return _intervalSeconds; };
-    uint8_t GetIntervalMinutes() { return _intervalMinutes; };
-    uint8_t GetIntervalHours() { return _intervalHours; };
+    uint8_t GetIntervalSeconds() { return _data.intervalSeconds; };
+    uint8_t GetIntervalMinutes() { return _data.intervalMinutes; };
+    uint8_t GetIntervalHours() { return _data.intervalHours; };
     void SetInterval(uint8_t hours, uint8_t minutes, uint8_t seconds);
 
-    unsigned long  GetTotalDurationMillis() { return ((_durationHours * 3600) + (_durationMinutes * 60) + _durationSeconds) * 1000; };
+    // unsigned long  GetTotalDurationMillis() { return ((_durationHours * 3600) + (_durationMinutes * 60) + _durationSeconds) * 1000; };
 
-    uint8_t GetDurationSeconds() { return _durationSeconds; };
-    uint8_t GetDurationMinutes() { return _durationMinutes; };
-    uint8_t GetDurationHours() { return _durationHours; };   
-    void SetDuration(uint8_t hours, uint8_t minutes, uint8_t seconds); 
+    // uint8_t GetDurationSeconds() { return _durationSeconds; };
+    // uint8_t GetDurationMinutes() { return _durationMinutes; };
+    // uint8_t GetDurationHours() { return _durationHours; };   
+    // void SetDuration(uint8_t hours, uint8_t minutes, uint8_t seconds); 
 
     // float GetShutterTime() { return _shutterTime; };
     // float GetInterval() { return _exposureInterval; };
 
-    SessionStartStyle GetSessionStartStyle() { return _sessionStartStyle; };
-    void SetSessionStartStyle(SessionStartStyle startStyle) { _sessionStartStyle = startStyle; };
+    SessionStartStyle GetSessionStartStyle() { return (SessionStartStyle)(_data.sessionStartStyle); };
+    void SetSessionStartStyle(SessionStartStyle startStyle) { _data.sessionStartStyle = (int)startStyle; };
     
-    SessionEndStyle GetSessionEndStyle() { return _sessionEndStyle; };
-    void SetSessionEndStyle(SessionEndStyle endStyle) { _sessionEndStyle = endStyle; };
+    // SessionEndStyle GetSessionEndStyle() { return _sessionEndStyle; };
+    // void SetSessionEndStyle(SessionEndStyle endStyle) { _sessionEndStyle = endStyle; };
 
     
-    int GetExposureCount() { return _sessionEndStyle == TOTAL_EXPOSURE_COUNT ? _exposureCount : 0; };
-    void SetExposureCount(int count);
+    int16_t GetExposureCount() { return  _data.exposureCount; };
+    void SetExposureCount(int16_t count);
+    
     //float GetTotalDuration() { return _sessionEndStyle == TOTAL_DURATION ? _totalDuration : 0; };
-    time_t GetEndDateTime() { return _endDateTime; };
+    //time_t GetEndDateTime() { return _endDateTime; };
 
     void GenerateStartDelayString(char* destination, bool showZero = false);
     void GenerateShutterString(char* destination);
@@ -85,33 +110,42 @@ class IntervalInfo
 
     void GenerateTimeString(char* destination, uint8_t hours, uint8_t minutes, uint8_t seconds, bool showZero = false);
 
+    IntervalometerSaveData* GetSaveData() { return &_data; };
+    void SetSaveData(IntervalometerSaveData data);
+
+    bool GetIsSaveDataDirty() { return _isSaveDataDirty; }
+    void SetIsSaveDataDirty(bool isDirty) { _isSaveDataDirty; }
+
   private:
 
-    uint8_t _startTimeHours = 0;
-    uint8_t _startTimeMinutes = 0;
+    IntervalometerSaveData _data;
+    bool _isSaveDataDirty = false;
 
-    uint8_t _startDelaySeconds = 5;
-    uint8_t _startDelayMinutes = 0;
-    uint8_t _startDelayHours = 0;
+    // uint8_t _startTimeHours = 0;
+    // uint8_t _startTimeMinutes = 0;
+
+    // uint8_t _startDelaySeconds = 5;
+    // uint8_t _startDelayMinutes = 0;
+    // uint8_t _startDelayHours = 0;
     
-    uint8_t _shutterSeconds = 10;
-    uint8_t _shutterMinutes = 0;
-    uint8_t _shutterHours = 0;
+    // uint8_t _shutterSeconds = 10;
+    // uint8_t _shutterMinutes = 0;
+    // uint8_t _shutterHours = 0;
 
-    uint8_t _intervalSeconds = 0;
-    uint8_t _intervalMinutes = 0;
-    uint8_t _intervalHours = 0;
+    // uint8_t _intervalSeconds = 0;
+    // uint8_t _intervalMinutes = 0;
+    // uint8_t _intervalHours = 0;
 
-    SessionStartStyle _sessionStartStyle = AFTER_DELAY;
-    SessionEndStyle _sessionEndStyle = TOTAL_EXPOSURE_COUNT;
+    // SessionStartStyle _sessionStartStyle = AFTER_DELAY;
+    // //SessionEndStyle _sessionEndStyle = TOTAL_EXPOSURE_COUNT;
 
-    int _exposureCount = 10;
+    // int _exposureCount = 10;
 
-    uint8_t _durationSeconds = 0;
-    uint8_t _durationMinutes = 0;
-    uint8_t _durationHours = 0;
+    // uint8_t _durationSeconds = 0;
+    // uint8_t _durationMinutes = 0;
+    // uint8_t _durationHours = 0;
     
-    time_t _endDateTime;
+    // time_t _endDateTime;
 
 };
 

@@ -76,7 +76,7 @@ class Selectable
     bool GetEnabled() { return _enabled; }
     void SetEnabled(bool enabled) { _enabled = enabled; _redrawRequired = true; }
 
-    void Flash() { _flashStartTime = millis();}
+    void Ping() { _flashStartTime = millis();}
 
     static void LinkInSequence(Selectable* selectable);
     static void EndSequence();

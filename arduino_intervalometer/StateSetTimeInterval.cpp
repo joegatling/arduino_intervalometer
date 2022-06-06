@@ -112,8 +112,6 @@ void StateSetTimeInterval::HandleClick(EncoderButton& eb)
         {
           _onComplete(true);
         }
-
-        //Controller::GetInstance()->SetState(Controller::IDLE);
       }
       else if(GetCurrentSelectable() == _saveSelectable)
       {
@@ -121,8 +119,6 @@ void StateSetTimeInterval::HandleClick(EncoderButton& eb)
         {
           _onComplete(false);
         }
-
-//        Controller::GetInstance()->SetState(Controller::IDLE);
       }
 
       GetCurrentSelectable()->SetState(Selectable::SELECTED);
@@ -163,7 +159,6 @@ void StateSetTimeInterval::Update(bool forceRedraw)
     display->display();
 
     _redrawRequired = false;
-
   }  
 }
 

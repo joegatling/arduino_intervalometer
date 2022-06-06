@@ -6,7 +6,6 @@
 
 #include "Selectable.h"
 
-
 #define MAX_SELECTABLES 16
 
   typedef void (*stateCompleteCallback)(bool);

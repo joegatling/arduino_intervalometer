@@ -7,67 +7,96 @@
 
 IntervalInfo::IntervalInfo() 
 {
-  _intervalSeconds = 10;
+  _data.isValid = true;
+
+  _data.startTimeHours = 5;
+  _data.startTimeMinutes = 0;
+
+  _data.startDelaySeconds = 0;
+  _data.startDelayMinutes = 0;
+  _data.startDelayHours = 0;
+  
+  _data.shutterSeconds = 0;
+  _data.shutterMinutes = 0;
+  _data.shutterHours = 0;
+
+  _data.intervalSeconds = 5;
+  _data.intervalMinutes = 0;
+  _data.intervalHours = 0;
+
+  _data.sessionStartStyle = (int)IntervalInfo::AFTER_DELAY;
+
+  _data.exposureCount = 10;
 }
 
 void IntervalInfo::SetStartDelay(uint8_t hours, uint8_t minutes, uint8_t seconds)
 {
-  _startDelayHours = hours;
-  _startDelayMinutes = minutes;
-  _startDelaySeconds = seconds;
+  _data.startDelayHours = hours;
+  _data.startDelayMinutes = minutes;
+  _data.startDelaySeconds = seconds;
+
+  _isSaveDataDirty = true;
 }
 
 void IntervalInfo::SetStartTime(uint8_t hours, uint8_t minutes)
 {
-  _startTimeHours = hours;
-  _startTimeMinutes = minutes;
+  _data.startTimeHours = hours;
+  _data.startTimeMinutes = minutes;
+
+  _isSaveDataDirty = true;
 }
 
 void IntervalInfo::SetShutter(uint8_t hours, uint8_t minutes, uint8_t seconds)
 {
-  _shutterHours = hours;
-  _shutterMinutes = minutes;
-  _shutterSeconds = seconds;
+  _data.shutterHours = hours;
+  _data.shutterMinutes = minutes;
+  _data.shutterSeconds = seconds;
+
+  _isSaveDataDirty = true;
 }
 
 void IntervalInfo::SetInterval(uint8_t hours, uint8_t minutes, uint8_t seconds)
 {
-  _intervalHours = hours;
-  _intervalMinutes = minutes;
-  _intervalSeconds = seconds;
+  _data.intervalHours = hours;
+  _data.intervalMinutes = minutes;
+  _data.intervalSeconds = seconds;
 
   if(GetTotalIntervalMillis() == 0)
   {
-    _intervalSeconds = 1;
+    _data.intervalSeconds = 1;
   }
+
+  _isSaveDataDirty = true;
 }
 
-void IntervalInfo::SetDuration(uint8_t hours, uint8_t minutes, uint8_t seconds)
-{
-  _durationHours = hours;
-  _durationMinutes = minutes;
-  _durationSeconds = seconds;
+// void IntervalInfo::SetDuration(uint8_t hours, uint8_t minutes, uint8_t seconds)
+// {
+//   _durationHours = hours;
+//   _durationMinutes = minutes;
+//   _durationSeconds = seconds;
 
-  _sessionEndStyle = IntervalInfo::TOTAL_DURATION;
-}
+//   _sessionEndStyle = IntervalInfo::TOTAL_DURATION;
+// }
 
-void IntervalInfo::SetExposureCount(int count) 
+void IntervalInfo::SetExposureCount(int16_t count) 
 { 
-  _sessionEndStyle = TOTAL_EXPOSURE_COUNT; 
+  //_sessionEndStyle = TOTAL_EXPOSURE_COUNT; 
 
-  _exposureCount = count;
+  _data.exposureCount = count;
 
-  while(_exposureCount < 0)
+  while(_data.exposureCount < 0)
   {
-    _exposureCount += MAX_EXPOSURE_COUNT;
+    _data.exposureCount += MAX_EXPOSURE_COUNT;
   }
 
-  _exposureCount = _exposureCount % MAX_EXPOSURE_COUNT;
+  _data.exposureCount = _data.exposureCount % MAX_EXPOSURE_COUNT;
+
+  _isSaveDataDirty = true;
 }
     
 void IntervalInfo::GenerateStartDelayString(char* destination, bool showZero)
 {
-  if(_sessionStartStyle == IntervalInfo::AFTER_DELAY)
+  if(_data.sessionStartStyle == IntervalInfo::AFTER_DELAY)
   {
     if(showZero == false && GetTotalStartDelayMillis() == 0)
     {
@@ -75,41 +104,43 @@ void IntervalInfo::GenerateStartDelayString(char* destination, bool showZero)
     }
     else
     {
-      GenerateTimeString(destination, _startDelayHours, _startDelayMinutes, _startDelaySeconds, showZero);
+      GenerateTimeString(destination, _data.startDelayHours, _data.startDelayMinutes, _data.startDelaySeconds, showZero);
     }
   }
   else
   {
-    Controller::GetInstance()->GenerateTimeString(destination, _startTimeHours, _startTimeMinutes);
+    Controller::GetInstance()->GenerateTimeString(destination, _data.startTimeHours, _data.startTimeMinutes);
   }
 }
 
 void IntervalInfo::GenerateShutterString(char* destination)
 {
-  GenerateTimeString(destination, _shutterHours, _shutterMinutes, _shutterSeconds);
+  GenerateTimeString(destination, _data.shutterHours, _data.shutterMinutes, _data.shutterSeconds);
 }
 
 void IntervalInfo::GenerateIntervalString(char* destination)
 {
-  GenerateTimeString(destination, _intervalHours, _intervalMinutes, _intervalSeconds);  
+  GenerateTimeString(destination, _data.intervalHours, _data.intervalMinutes, _data.intervalSeconds);  
 }
 
 void IntervalInfo::GenerateDurationString(char* destination)
 {
-  auto endStyle = GetSessionEndStyle();
+  sprintf(destination, "%d", _data.exposureCount);
 
-  if(endStyle == IntervalInfo::TOTAL_DURATION)
-  {
-    GenerateTimeString(destination, _durationHours, _durationMinutes, _durationSeconds);  
-  }
-  else if(endStyle == IntervalInfo::TOTAL_EXPOSURE_COUNT)
-  {
-    sprintf(destination, "%d", _exposureCount);
-  }
-  else if(endStyle == IntervalInfo::NO_END)
-  {
-    sprintf(destination, "-");
-  }  
+  // //auto endStyle = GetSessionEndStyle();
+
+  // if(endStyle == IntervalInfo::TOTAL_DURATION)
+  // {
+  //   GenerateTimeString(destination, _durationHours, _durationMinutes, _durationSeconds);  
+  // }
+  // else if(endStyle == IntervalInfo::TOTAL_EXPOSURE_COUNT)
+  // {
+  //   sprintf(destination, "%d", _exposureCount);
+  // }
+  // else if(endStyle == IntervalInfo::NO_END)
+  // {
+  //   sprintf(destination, "-");
+  // }  
 }
 
 void IntervalInfo::GenerateTimeString(char* destination, uint8_t hours, uint8_t minutes, uint8_t seconds, bool showZero)
@@ -148,4 +179,26 @@ void IntervalInfo::GenerateTimeString(char* destination, uint8_t hours, uint8_t 
   {
     sprintf(destination, "-");
   }
+}
+
+void IntervalInfo::SetSaveData(IntervalometerSaveData data)
+{
+  _data.startTimeHours = data.startTimeHours;
+  _data.startTimeMinutes = data.startTimeMinutes;
+
+  _data.startDelaySeconds = data.startDelaySeconds;
+  _data.startDelayMinutes = data.startDelayMinutes;
+  _data.startDelayHours = data.startDelayHours;
+  
+  _data.shutterSeconds = data.shutterSeconds;
+  _data.shutterMinutes = data.shutterMinutes;
+  _data.shutterHours = data.shutterHours;
+
+  _data.intervalSeconds = data.intervalSeconds;
+  _data.intervalMinutes = data.intervalMinutes;
+  _data.intervalHours = data.intervalHours;
+
+  _data.sessionStartStyle = data.sessionStartStyle;
+
+  _data.exposureCount = data.exposureCount;  
 }

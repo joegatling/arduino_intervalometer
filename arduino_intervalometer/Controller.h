@@ -10,8 +10,8 @@
 #include <EncoderButton.h>
 
 
-#include "State.h"
 #include "IntervalInfo.h"
+#include "State.h"
 
 #define SCREEN_WIDTH 64 // OLED display width, in pixels
 #define SCREEN_HEIGHT 128 // OLED display height, in pixels

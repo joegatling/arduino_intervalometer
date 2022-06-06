@@ -119,12 +119,12 @@ void StateSetClock::HandleClick(EncoderButton& eb)
       {
         Controller::GetInstance()->Set24TimeFormat(!Controller::GetInstance()->Get24TimeFormat());
         _amPmSelectable->SetEnabled(Controller::GetInstance()->Get24TimeFormat() == false);
-        _timeFormatSelectable->Flash();
+        _timeFormatSelectable->Ping();
       }
       else if(GetCurrentSelectable() == _amPmSelectable)
       {
         _hours = (_hours + 12) % 24;
-        _amPmSelectable->Flash();
+        _amPmSelectable->Ping();
       }      
       else
       {
