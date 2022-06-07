@@ -28,7 +28,124 @@
 #define BOOT_LOGO_WIDTH 58
 #define BOOT_LOGO_HEIGHT 54
 
+#define BATTERY_ICON_WIDTH 12
+#define BATTERY_ICON_HEIGHT 9
+
+
 #define SLEEP_TIMEOUT 300000
+
+
+
+
+
+class Controller 
+{
+  public:
+    enum ProgramState
+    {
+      UNSET = -1,
+      NONE = 0,
+      IDLE,
+      RUNNING,
+      SET_START_STYLE,
+      SET_CLOCK,
+      SET_TIME_INTERVAL,
+      SET_DURATION,
+      MESSAGE,
+      STATE_COUNT
+    };
+
+    static Controller* GetInstance();    
+    static void Initialize();
+
+    static void WakeInterrupt();
+
+    void Update();
+
+    void SetState(ProgramState state);
+    State* GetCurrentState();
+
+    ProgramState GetState();
+    Adafruit_SSD1306* GetDisplay();
+    EncoderButton* GetKnob();
+    RTCZero* GetRTC();
+    IntervalInfo* GetConfig();
+
+    void SetShutter(bool isPressed);
+    void SetFocus(bool isPressed);
+
+    bool Get24TimeFormat() { return _use24HourFormat; };
+    void Set24TimeFormat(bool use24HourFormat ) { _use24HourFormat = use24HourFormat; };
+
+    void GenerateTimeString(char* destination, uint8_t hours, uint8_t minutes, uint8_t seconds = 0);
+    void GenerateTimeString(char* destination);
+
+    unsigned long GetMillisSinceLastInput() { return millis() - _lastInputTime; };
+    void ResetLastInputMillis() { _lastInputTime = millis(); }; 
+
+    unsigned long GetMillisSinceWakeUp() { return millis() - _wakeUpTime; };
+    unsigned long GetMillisInCurrentState() { return millis() - _stateEnterTime; };
+
+    bool GetIsAsleep() { return _isAsleep; };
+    void Sleep();
+    void WakeUp(bool isUserInput);
+
+    void SetDisplayState(bool isOn);
+    bool GetDisplayState() { return _isDisplayOn; };
+
+    void SetLedToSleepState() { digitalWrite(LED_RED_PIN, _isDisplayOn ? LOW : HIGH); };
+
+    void SetOverrideLedState(bool isOn);
+    void ClearOverrideLedState();
+
+    float GetBatteryVoltage();
+    const unsigned char* GetBatteryIconForCurrentVoltage();
+
+  private:
+    enum LedOverrideState
+    {
+      NO_OVERRIDE,
+      OVERRIDE_ON,
+      OVERRIDE_OFF
+    };
+
+    Controller();
+
+    static void HandleEncoder(EncoderButton& eb);
+    static void HandleClick(EncoderButton& eb); 
+
+    static Controller* _instance;
+    static volatile bool _discardInterrupts;
+
+    void UpdateBatteryVoltage();
+
+    IntervalInfo _config;
+
+    State* _states[STATE_COUNT];
+    ProgramState _currentProgramState = NONE;
+    ProgramState _nextProgramState = UNSET;
+
+    Adafruit_SSD1306* _display;
+    EncoderButton* _knob;
+    RTCZero* _rtc;
+
+    volatile unsigned long _lastInputTime = 0;
+    volatile unsigned long _wakeUpTime = 0;
+    volatile bool _isAsleep = false;
+    volatile bool _isDisplayOn = true;
+
+    unsigned long _stateEnterTime = 0;
+    
+    bool _redrawRequired = false;
+    bool _use24HourFormat = true;
+
+    LedOverrideState _ledOverride = NO_OVERRIDE;
+
+    void UpdateLedState();
+
+    float _currentBatteryVoltage = 0.0f;
+};
+
 
 
 // 'end', 7x11px
@@ -105,107 +222,30 @@ const unsigned char boot_logo [] PROGMEM = {
 	0x3f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc0, 0x3f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc0
 };
 
-class Controller 
-{
-  public:
-    enum ProgramState
-    {
-      UNSET = -1,
-      NONE = 0,
-      IDLE,
-      RUNNING,
-      SET_START_STYLE,
-      SET_CLOCK,
-      SET_TIME_INTERVAL,
-      SET_DURATION,
-      MESSAGE,
-      STATE_COUNT
-    };
-
-    static Controller* GetInstance();    
-    static void Initialize();
-
-    static void WakeInterrupt();
-
-    void Update();
-
-    void SetState(ProgramState state);
-    State* GetCurrentState();
-
-    ProgramState GetState();
-    Adafruit_SSD1306* GetDisplay();
-    EncoderButton* GetKnob();
-    RTCZero* GetRTC();
-    IntervalInfo* GetConfig();
-
-    void SetShutter(bool isPressed);
-    void SetFocus(bool isPressed);
-
-    bool Get24TimeFormat() { return _use24HourFormat; };
-    void Set24TimeFormat(bool use24HourFormat ) { _use24HourFormat = use24HourFormat; };
-
-    void GenerateTimeString(char* destination, uint8_t hours, uint8_t minutes, uint8_t seconds = 0);
-    void GenerateTimeString(char* destination);
-
-    unsigned long GetMillisSinceLastInput() { return millis() - _lastInputTime; };
-    void ResetLastInputMillis() { _lastInputTime = millis(); }; 
-
-    unsigned long GetMillisSinceWakeUp() { return millis() - _wakeUpTime; };
-    unsigned long GetMillisInCurrentState() { return millis() - _stateEnterTime; };
-
-    bool GetIsAsleep() { return _isAsleep; };
-    void Sleep();
-    void WakeUp(bool isUserInput);
-
-    void SetDisplayState(bool isOn);
-    bool GetDisplayState() { return _isDisplayOn; };
-
-    void SetLedToSleepState() { digitalWrite(LED_RED_PIN, _isDisplayOn ? LOW : HIGH); };
-
-    void SetOverrideLedState(bool isOn);
-    void ClearOverrideLedState();
-
-  private:
-    enum LedOverrideState
-    {
-      NO_OVERRIDE,
-      OVERRIDE_ON,
-      OVERRIDE_OFF
-    };
-
-    Controller();
-
-    static void HandleEncoder(EncoderButton& eb);
-    static void HandleClick(EncoderButton& eb); 
-
-
-
-    static Controller* _instance;
-    static volatile bool _discardInterrupts;
-
-    IntervalInfo _config;
-
-    State* _states[STATE_COUNT];
-    ProgramState _currentProgramState = NONE;
-    ProgramState _nextProgramState = UNSET;
-
-    Adafruit_SSD1306* _display;
-    EncoderButton* _knob;
-    RTCZero* _rtc;
-
-    volatile unsigned long _lastInputTime = 0;
-    volatile unsigned long _wakeUpTime = 0;
-    volatile bool _isAsleep = false;
-    volatile bool _isDisplayOn = true;
-
-    unsigned long _stateEnterTime = 0;
-    
-    bool _redrawRequired = false;
-    bool _use24HourFormat = true;
-
-    LedOverrideState _ledOverride = NO_OVERRIDE;
-
-    void UpdateLedState();
+// 'sprite_0', 12x9px
+const unsigned char battery_0 [] PROGMEM = {
+	0xff, 0xe0, 0xfb, 0xe0, 0xfb, 0xf0, 0xfb, 0xf0, 0xfb, 0xf0, 0xfb, 0xf0, 0xff, 0xf0, 0xfb, 0xe0, 
+	0xff, 0xe0
+};
+// 'sprite_1', 12x9px
+const unsigned char battery_1 [] PROGMEM = {
+	0xff, 0xe0, 0x9f, 0xe0, 0x9f, 0xf0, 0x9f, 0xf0, 0x9f, 0xf0, 0x9f, 0xf0, 0x9f, 0xf0, 0x9f, 0xe0, 
+	0xff, 0xe0
+};
+// 'sprite_2', 12x9px
+const unsigned char battery_2 [] PROGMEM = {
+	0xff, 0xe0, 0x83, 0xe0, 0x83, 0xf0, 0x83, 0xf0, 0x83, 0xf0, 0x83, 0xf0, 0x83, 0xf0, 0x83, 0xe0, 
+	0xff, 0xe0
+};
+// 'sprite_3', 12x9px
+const unsigned char battery_3 [] PROGMEM = {
+	0xff, 0xe0, 0x80, 0x20, 0x80, 0x30, 0x80, 0x10, 0x80, 0x10, 0x80, 0x10, 0x80, 0x30, 0x80, 0x20, 
+	0xff, 0xe0
+};
+// 'sprite_4', 12x9px
+const unsigned char battery_4 [] PROGMEM = {
+	0x00, 0x00, 0x1f, 0x00, 0x31, 0xc0, 0xe0, 0x40, 0x01, 0xc0, 0xe0, 0x40, 0x31, 0xc0, 0x1f, 0x00, 
+	0x00, 0x00
 };
 
 

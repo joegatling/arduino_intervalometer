@@ -111,6 +111,8 @@ void StateRunning::Update(bool forceRedraw)
 
     UpdateUnlock(display);
 
+    display->drawBitmap(1,2,Controller::GetInstance()->GetBatteryIconForCurrentVoltage(), BATTERY_ICON_WIDTH, BATTERY_ICON_HEIGHT, SSD1306_WHITE);
+
     display->fillRect(0, 0, SCREEN_WIDTH, SELECTABLE_SPACING_1, SSD1306_INVERSE);
     display->display();
 

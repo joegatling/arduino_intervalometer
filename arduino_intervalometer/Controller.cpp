@@ -20,6 +20,8 @@
 #define SHUTTER_PIN 11
 #define FOCUS_PIN 12
 
+#define BATTERY_PIN A7
+
 #define WAKE_UP_INPUT_DELAY 200
 
 volatile bool Controller::_discardInterrupts = false;
@@ -134,6 +136,8 @@ void Controller::Update()
   {    
     _knob->update();
   }
+
+  UpdateBatteryVoltage();
 
   if(_nextProgramState != Controller::UNSET)
   {
@@ -357,5 +361,42 @@ void Controller::UpdateLedState()
     digitalWrite(LED_RED_PIN, _isDisplayOn ? LOW : HIGH);
   }
 
+}
+
+void Controller::UpdateBatteryVoltage()
+{
+  _currentBatteryVoltage = analogRead(BATTERY_PIN);
+  _currentBatteryVoltage *= 2;    // we divided by 2, so multiply back
+  _currentBatteryVoltage *= 3.3;  // Multiply by 3.3V, our reference voltage
+  _currentBatteryVoltage /= 1024; // convert to voltage
+}
+
+float Controller::GetBatteryVoltage()
+{
+  return _currentBatteryVoltage;
+}
+
+const unsigned char* Controller::GetBatteryIconForCurrentVoltage()
+{
+  if(GetBatteryVoltage() > 4.3f)
+  {
+    return battery_4;
+  }
+  else if(GetBatteryVoltage() > 3.8f)
+  {
+    return battery_3;
+  }
+  else if(GetBatteryVoltage() > 3.7f)
+  {
+    return battery_2;
+  }  
+  else if(GetBatteryVoltage() > 3.5f)
+  {
+    return battery_1;
+  }  
+  else
+  {
+    return battery_0;
+  }  
 }
 

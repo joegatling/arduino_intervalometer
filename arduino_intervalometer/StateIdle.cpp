@@ -86,6 +86,10 @@ void StateIdle::Update(bool forceRedraw)
     display->drawBitmap(0, Y_OFFSET + SELECTABLE_SPACING_1*2, icon_interval, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
     display->drawBitmap(0, Y_OFFSET + SELECTABLE_SPACING_1*3, icon_count, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
 
+    display->drawBitmap(1,2,Controller::GetInstance()->GetBatteryIconForCurrentVoltage(), BATTERY_ICON_WIDTH, BATTERY_ICON_HEIGHT, SSD1306_WHITE);
+    // display->setCursor(0,11);
+    // display->print(Controller::GetInstance()->GetBatteryVoltage());
+
     display->fillRect(0, 0, SCREEN_WIDTH, SELECTABLE_SPACING_1, SSD1306_INVERSE);
 
     display->display();
