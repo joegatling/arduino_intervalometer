@@ -104,6 +104,8 @@ Controller::Controller()
   _isAsleep = false;
   _redrawRequired = false;
 
+  //_batteryVoltage = CircularBuffer(32);
+
   UpdateLedState();
 }
 
@@ -365,15 +367,17 @@ void Controller::UpdateLedState()
 
 void Controller::UpdateBatteryVoltage()
 {
-  _currentBatteryVoltage = analogRead(BATTERY_PIN);
-  _currentBatteryVoltage *= 2;    // we divided by 2, so multiply back
-  _currentBatteryVoltage *= 3.3;  // Multiply by 3.3V, our reference voltage
-  _currentBatteryVoltage /= 1024; // convert to voltage
+  float voltage = analogRead(BATTERY_PIN);
+  voltage *= 2;    // we divided by 2, so multiply back
+  voltage *= 3.3;  // Multiply by 3.3V, our reference voltage
+  voltage /= 1024; // convert to voltage
+
+  _batteryVoltage.Add(voltage);
 }
 
 float Controller::GetBatteryVoltage()
 {
-  return _currentBatteryVoltage;
+  return _batteryVoltage.Average();
 }
 
 const unsigned char* Controller::GetBatteryIconForCurrentVoltage()
