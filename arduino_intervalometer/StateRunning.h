@@ -86,6 +86,8 @@ class StateRunning : public State
     static char* GetClockString();
     static char* GetExposuresRemainingString();
 
+    const unsigned char* _currentBatteryIcon = NULL;
+
     float lerp(float a, float b, float x){  return a + x * (b - a); };
 
     void UpdateStates();

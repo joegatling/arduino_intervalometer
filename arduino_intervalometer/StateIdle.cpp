@@ -68,7 +68,9 @@ void StateIdle::Update(bool forceRedraw)
 {
   _redrawRequired |= forceRedraw;
 
-  if(UpdateAllSelectables() || _redrawRequired)
+  const unsigned char* batteryIcon = Controller::GetInstance()->GetBatteryIconForCurrentVoltage();
+
+  if(UpdateAllSelectables() || _redrawRequired || batteryIcon != _currentBatteryIcon)
   {
     _redrawRequired = false;
     Adafruit_SSD1306* display = Controller::GetInstance()->GetDisplay();
@@ -86,9 +88,11 @@ void StateIdle::Update(bool forceRedraw)
     display->drawBitmap(0, Y_OFFSET + SELECTABLE_SPACING_1*2, icon_interval, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
     display->drawBitmap(0, Y_OFFSET + SELECTABLE_SPACING_1*3, icon_count, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
 
-    display->drawBitmap(1,2,Controller::GetInstance()->GetBatteryIconForCurrentVoltage(), BATTERY_ICON_WIDTH, BATTERY_ICON_HEIGHT, SSD1306_WHITE);
-    // display->setCursor(0,11);
+    _currentBatteryIcon = batteryIcon;
+    display->drawBitmap(1,2,_currentBatteryIcon, BATTERY_ICON_WIDTH, BATTERY_ICON_HEIGHT, SSD1306_WHITE);
+    // display->setCursor(0,Y_OFFSET + SELECTABLE_SPACING_1*4 + 5);
     // display->print(Controller::GetInstance()->GetBatteryVoltage());
+    // display->print("v");
 
     display->fillRect(0, 0, SCREEN_WIDTH, SELECTABLE_SPACING_1, SSD1306_INVERSE);
 

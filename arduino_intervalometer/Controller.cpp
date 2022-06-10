@@ -360,7 +360,7 @@ void Controller::UpdateLedState()
   }
   else
   {
-    digitalWrite(LED_RED_PIN, _isDisplayOn ? LOW : HIGH);
+    digitalWrite(LED_RED_PIN, LOW);
   }
 
 }

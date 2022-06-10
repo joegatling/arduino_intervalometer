@@ -47,6 +47,8 @@ class StateIdle : public State
     static char* GetDurationString();
 
     static char* GetClockString();
+    
+    const unsigned char* _currentBatteryIcon = NULL;
 
     bool _redrawRequired;
 };
