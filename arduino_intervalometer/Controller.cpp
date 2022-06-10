@@ -165,9 +165,12 @@ void Controller::Update()
 
   _redrawRequired = false; 
 
-  if(min(GetMillisSinceWakeUp(), GetMillisSinceLastInput()) > SLEEP_TIMEOUT)
+  if(GetSleepDisabled() == false)
   {
-    Sleep();
+    if(min(GetMillisSinceWakeUp(), GetMillisSinceLastInput()) > SLEEP_TIMEOUT)
+    {
+      SleepInternal();
+    }
   }
 
   // This will be the first line to execute after sleep
@@ -265,7 +268,7 @@ void Controller::GenerateTimeString(char* destination)
   GenerateTimeString(destination, GetRTC()->getHours(), GetRTC()->getMinutes(), GetRTC()->getSeconds());
 }
 
-void Controller::Sleep()
+void Controller::SleepInternal()
 {
   if(!_isAsleep)
   {

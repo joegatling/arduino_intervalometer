@@ -38,7 +38,6 @@ void SubStateShutter::Enter()
     rtc->setAlarmDate(t.tm_mday, t.tm_mon, t.tm_year);
     rtc->enableAlarm(rtc->MATCH_YYMMDDHHMMSS);
     
-
     rtc->attachInterrupt(OnAlarm);
   }
 
@@ -47,6 +46,7 @@ void SubStateShutter::Enter()
   Controller::GetInstance()->SetOverrideLedState(Controller::GetInstance()->GetDisplayState());
 
   _isBlinking = true;
+  Controller::GetInstance()->SetSleepDisabled(true);
 }
 
 void SubStateShutter::Update()
@@ -55,6 +55,8 @@ void SubStateShutter::Update()
   {
     _isBlinking = false;
     Controller::GetInstance()->ClearOverrideLedState();
+
+    Controller::GetInstance()->SetSleepDisabled(false);
   }
 
   auto config = Controller::GetInstance()->GetConfig();
