@@ -120,33 +120,6 @@ class IntervalInfo
 
     IntervalometerSaveData _data;
     bool _isSaveDataDirty = false;
-
-    // uint8_t _startTimeHours = 0;
-    // uint8_t _startTimeMinutes = 0;
-
-    // uint8_t _startDelaySeconds = 5;
-    // uint8_t _startDelayMinutes = 0;
-    // uint8_t _startDelayHours = 0;
-    
-    // uint8_t _shutterSeconds = 10;
-    // uint8_t _shutterMinutes = 0;
-    // uint8_t _shutterHours = 0;
-
-    // uint8_t _intervalSeconds = 0;
-    // uint8_t _intervalMinutes = 0;
-    // uint8_t _intervalHours = 0;
-
-    // SessionStartStyle _sessionStartStyle = AFTER_DELAY;
-    // //SessionEndStyle _sessionEndStyle = TOTAL_EXPOSURE_COUNT;
-
-    // int _exposureCount = 10;
-
-    // uint8_t _durationSeconds = 0;
-    // uint8_t _durationMinutes = 0;
-    // uint8_t _durationHours = 0;
-    
-    // time_t _endDateTime;
-
 };
 
 #endif //INTERVAL_INFO_H

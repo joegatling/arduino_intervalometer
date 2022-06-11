@@ -100,7 +100,7 @@ void IntervalInfo::GenerateStartDelayString(char* destination, bool showZero)
   {
     if(showZero == false && GetTotalStartDelayMillis() == 0)
     {
-      sprintf(destination, "-");
+      sprintf(destination, "NOW");
     }
     else
     {

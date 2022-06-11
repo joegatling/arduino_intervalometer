@@ -13,6 +13,8 @@
 #include "Selectable.h"
 #include "IntervalInfo.h"
 
+#define HINT_DURATION 2000
+
 class StateIdle : public State
 {
   public:
@@ -47,7 +49,11 @@ class StateIdle : public State
     static char* GetDurationString();
 
     static char* GetClockString();
+
+    bool ShouldShowHint();
     
+    bool _showHint = false;
+
     const unsigned char* _currentBatteryIcon = NULL;
 
     bool _redrawRequired;

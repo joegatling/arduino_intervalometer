@@ -7,7 +7,7 @@
 #include "SubStateFinished.h"
 #include "StateMessage.h"
 
-#define Y_OFFSET 24
+#define Y_OFFSET 32
 
 #define MAX_LOCK_SLIDE_SPEED 6
 #define UNLOCK_TIMEOUT 500
@@ -96,14 +96,20 @@ void StateRunning::Update(bool forceRedraw)
 
   const unsigned char* batteryIcon = Controller::GetInstance()->GetBatteryIconForCurrentVoltage();
 
+  _startSelectable->SetEnabled(_currentSubState == StateRunning::START);
+
   if(UpdateAllSelectables() || _redrawRequired || _isUnlocking || batteryIcon != _currentBatteryIcon)
   {
+    _redrawRequired = false;
+
     Adafruit_SSD1306* display = Controller::GetInstance()->GetDisplay();
 
     display->clearDisplay();  
   
-
-    display->drawBitmap(0, Y_OFFSET, icon_start, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
+    if(_currentSubState == StateRunning::START)
+    {
+      display->drawBitmap(0, Y_OFFSET, icon_start, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
+    }
     display->drawBitmap(0, Y_OFFSET + SELECTABLE_SPACING_1, icon_shutter, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
     display->drawBitmap(0, Y_OFFSET + SELECTABLE_SPACING_1*2, icon_interval, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
     display->drawBitmap(0, Y_OFFSET + SELECTABLE_SPACING_1*3, icon_count, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
@@ -119,7 +125,6 @@ void StateRunning::Update(bool forceRedraw)
     display->display();
 
     __refreshAllText = false;
-    _redrawRequired = false;
   }
 
   UpdateStates();
@@ -145,8 +150,7 @@ void StateRunning::HandleEncoder(EncoderButton& eb)
     if(eb.increment() != 0)
     {
       _lastUnlockMillis = millis();
-      _wobbleX = random(-2, 2);
-      _wobbleY = random(-2, 2);
+
       _redrawRequired = true;
     }    
   }
@@ -172,10 +176,16 @@ void StateRunning::UpdateUnlock(Adafruit_GFX* display)
       _wobbleY = 0;
       _redrawRequired = true;
     }
+    else if(millis() - _lastUnlockMillis < 250)
+    {    
+      _wobbleX = random(-2, 2);
+      _wobbleY = random(-2, 2);
+      _redrawRequired = true;
+    }
 
     if(_wobbleX != 0 || _wobbleY != 0)
     {
-      display->setCursor(UNLOCK_ICON_WIDTH+4,SCREEN_HEIGHT - 8);    
+      display->setCursor(UNLOCK_ICON_WIDTH+4 + _wobbleX,SCREEN_HEIGHT - 8 + _wobbleY);    
       display->print("CLICK!");
     }
 

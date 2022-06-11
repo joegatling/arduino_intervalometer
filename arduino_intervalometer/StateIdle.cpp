@@ -8,7 +8,7 @@
 // #define ICONS_WIDTH 9
 // #define ICONS_HEIGHT 55
 
-#define Y_OFFSET 24
+#define Y_OFFSET 32
 
 
 char StateIdle::__clockString[] = "\0";
@@ -68,9 +68,13 @@ void StateIdle::Update(bool forceRedraw)
 {
   _redrawRequired |= forceRedraw;
 
-  const unsigned char* batteryIcon = Controller::GetInstance()->GetBatteryIconForCurrentVoltage();
+  const unsigned char* batteryIcon = Controller::GetInstance()->GetBatteryIconForCurrentVoltage();  
 
-  if(UpdateAllSelectables() || _redrawRequired || batteryIcon != _currentBatteryIcon)
+  bool shouldEraseHint = _showHint && !ShouldShowHint();
+  _showHint = ShouldShowHint();
+
+
+  if(UpdateAllSelectables() || _redrawRequired || shouldEraseHint || batteryIcon != _currentBatteryIcon)
   {
     _redrawRequired = false;
     Adafruit_SSD1306* display = Controller::GetInstance()->GetDisplay();
@@ -94,6 +98,29 @@ void StateIdle::Update(bool forceRedraw)
     // display->print(Controller::GetInstance()->GetBatteryVoltage());
     // display->print("v");
 
+    if(ShouldShowHint())
+    {
+      display->setCursor(2, SELECTABLE_SPACING_1+4);
+
+
+      if(GetCurrentSelectable() == _intervalSettingsSelectable)
+      {
+        display->print("INTERVAL");
+      }  
+      else if(GetCurrentSelectable() == _endSettingsSelectable)
+      {
+        display->print("FRAMES");      
+      }
+      else if(GetCurrentSelectable() == _startSettingsSelectable)
+      {
+        display->print("START");            
+      }
+      else if(GetCurrentSelectable() == _shutterSettingsSelectable)
+      {
+        display->print("SHUTTER");            
+      }
+    }
+
     display->fillRect(0, 0, SCREEN_WIDTH, SELECTABLE_SPACING_1, SSD1306_INVERSE);
 
     display->display();
@@ -102,6 +129,12 @@ void StateIdle::Update(bool forceRedraw)
 
 void StateIdle::Exit()
 {}
+
+bool StateIdle::ShouldShowHint()
+{ 
+  return Controller::GetInstance()->GetMillisSinceLastInput() < HINT_DURATION; 
+};
+
 
 void StateIdle::HandleEncoder(EncoderButton& eb)
 {

@@ -74,7 +74,7 @@ class Selectable
     void SetAlignment(Alignment alignment);
 
     bool GetEnabled() { return _enabled; }
-    void SetEnabled(bool enabled) { _enabled = enabled; _redrawRequired = true; }
+    void SetEnabled(bool enabled) { if(_enabled != enabled) {_enabled = enabled; _redrawRequired = true;} }
 
     void Ping() { _flashStartTime = millis();}
 
