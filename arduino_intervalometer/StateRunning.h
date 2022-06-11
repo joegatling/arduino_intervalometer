@@ -18,7 +18,7 @@ class StateRunning : public State
 {
 
   public:
-    enum RunningSubState
+    enum SubStateType
     {
       UNSET = -1,
       NONE = 0,
@@ -38,9 +38,11 @@ class StateRunning : public State
     void HandleEncoder(EncoderButton& eb);
     void HandleClick(EncoderButton& eb);
 
-    void SetSubState(RunningSubState state);
+    void SetSubState(SubStateType state);
     SubState* GetCurrentSubState();
-    SubState* GetSubState(RunningSubState state);
+    SubStateType GetCurrentSubStateType() { return _currentSubState; };
+    SubState* GetSubState(SubStateType state);
+
 
     void SetExposureCount(unsigned int count) {_exposureCount = count;};
     unsigned int GetExposureCount() { return _exposureCount; };
@@ -58,8 +60,8 @@ class StateRunning : public State
     SubState* _subStates[STATE_COUNT];
     Selectable* _selectablesForStates[STATE_COUNT];
 
-    RunningSubState _currentSubState = NONE;
-    RunningSubState _nextSubState = NONE;
+    SubStateType _currentSubState = NONE;
+    SubStateType _nextSubState = NONE;
 
     Selectable* _startSelectable;
     Selectable* _shutterSelectable;
@@ -70,6 +72,7 @@ class StateRunning : public State
 
     static char __clockString[8];
     static char __exposureRemainingString[8];
+    static char __startDoneString[3];
 
     bool _isUnlocking = false;
     unsigned long _lastUnlockMillis = 0;

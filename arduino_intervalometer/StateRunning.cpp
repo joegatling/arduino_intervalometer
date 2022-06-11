@@ -16,8 +16,8 @@ StateRunning* StateRunning::__instance = 0;
 bool StateRunning::__refreshAllText = false;
 
 char StateRunning::__clockString[] = "\0";
-
 char StateRunning::__exposureRemainingString[] = "\0";
+char StateRunning::__startDoneString[] = "-\0";
 
 StateRunning::StateRunning()
 {
@@ -96,8 +96,6 @@ void StateRunning::Update(bool forceRedraw)
 
   const unsigned char* batteryIcon = Controller::GetInstance()->GetBatteryIconForCurrentVoltage();
 
-  _startSelectable->SetEnabled(_currentSubState == StateRunning::START);
-
   if(UpdateAllSelectables() || _redrawRequired || _isUnlocking || batteryIcon != _currentBatteryIcon)
   {
     _redrawRequired = false;
@@ -106,10 +104,7 @@ void StateRunning::Update(bool forceRedraw)
 
     display->clearDisplay();  
   
-    if(_currentSubState == StateRunning::START)
-    {
-      display->drawBitmap(0, Y_OFFSET, icon_start, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
-    }
+    display->drawBitmap(0, Y_OFFSET, icon_start, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
     display->drawBitmap(0, Y_OFFSET + SELECTABLE_SPACING_1, icon_shutter, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
     display->drawBitmap(0, Y_OFFSET + SELECTABLE_SPACING_1*2, icon_interval, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
     display->drawBitmap(0, Y_OFFSET + SELECTABLE_SPACING_1*3, icon_count, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
@@ -272,8 +267,15 @@ void StateRunning::UpdateStates()
 
 char* StateRunning::GetDelayString()
 {
-  SubStateStart* startState = (SubStateStart*)(StateRunning::GetInstance()->GetSubState(StateRunning::START));
-  return startState->GetDisplayString(__refreshAllText);
+  if(StateRunning::GetInstance()->GetCurrentSubStateType() == StateRunning::START)
+  {
+    SubStateStart* startState = (SubStateStart*)(StateRunning::GetInstance()->GetSubState(StateRunning::START));
+    return startState->GetDisplayString(__refreshAllText);
+  }
+  else
+  {
+    return __startDoneString;
+  }
 }
 
 char* StateRunning::GetShutterString()
@@ -297,11 +299,20 @@ char* StateRunning::GetClockString()
 char* StateRunning::GetExposuresRemainingString()
 {
   auto config = Controller::GetInstance()->GetConfig();
-  sprintf(__exposureRemainingString, "%d", config->GetExposureCount() - StateRunning::GetInstance()->GetExposureCount());
+
+  if(config->GetExposureCount() > 0)
+  {
+    sprintf(__exposureRemainingString, "%d", config->GetExposureCount() - StateRunning::GetInstance()->GetExposureCount());
+  }
+  else
+  {
+    sprintf(__exposureRemainingString, "%d", StateRunning::GetInstance()->GetExposureCount());
+  }
+
   return __exposureRemainingString;      
 }
 
-void StateRunning::SetSubState(RunningSubState state)
+void StateRunning::SetSubState(SubStateType state)
 {
   _nextSubState = state;
 }
@@ -311,7 +322,7 @@ SubState* StateRunning::GetCurrentSubState()
   return _subStates[_currentSubState];
 }
 
-SubState* StateRunning::GetSubState(RunningSubState state)
+SubState* StateRunning::GetSubState(SubStateType state)
 {
   return _subStates[state];
 }

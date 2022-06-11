@@ -9,7 +9,7 @@ IntervalInfo::IntervalInfo()
 {
   _data.isValid = true;
 
-  _data.startTimeHours = 5;
+  _data.startTimeHours = 0;
   _data.startTimeMinutes = 0;
 
   _data.startDelaySeconds = 0;
@@ -26,7 +26,7 @@ IntervalInfo::IntervalInfo()
 
   _data.sessionStartStyle = (int)IntervalInfo::AFTER_DELAY;
 
-  _data.exposureCount = 10;
+  _data.exposureCount = 0;
 }
 
 void IntervalInfo::SetStartDelay(uint8_t hours, uint8_t minutes, uint8_t seconds)
@@ -125,7 +125,14 @@ void IntervalInfo::GenerateIntervalString(char* destination)
 
 void IntervalInfo::GenerateDurationString(char* destination)
 {
-  sprintf(destination, "%d", _data.exposureCount);
+  if(_data.exposureCount == 0)
+  {
+    sprintf(destination, "-");  
+  }
+  else
+  {
+    sprintf(destination, "%d", _data.exposureCount);
+  }
 
   // //auto endStyle = GetSessionEndStyle();
 

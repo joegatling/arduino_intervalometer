@@ -68,14 +68,14 @@ void SubStateShutter::Update()
 
   if(_isComplete)
   {
+    unsigned int count = StateRunning::GetInstance()->IncrementExposureCount();
+
     if(config->GetExposureCount() == 0)
     {
       StateRunning::GetInstance()->SetSubState(StateRunning::INTERVAL);
     }
     else
     {
-      unsigned int count = StateRunning::GetInstance()->IncrementExposureCount();
-
       if(count >= config->GetExposureCount())
       {
         StateRunning::GetInstance()->SetSubState(StateRunning::FINISHED);

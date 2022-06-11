@@ -128,8 +128,17 @@ void Controller::Initialize()
 
   Controller::GetInstance()->SetState(Controller::SET_CLOCK);  
 
+  // Set up interrupt pins
   pinMode(A1, INPUT_PULLUP);
   pinMode(A2, INPUT_PULLUP);
+
+  // Pull down unused Pins (this saves power?)
+  digitalWrite(A0, LOW);
+  digitalWrite(A3, LOW);
+  digitalWrite(A4, LOW);
+  digitalWrite(A5, LOW);
+  digitalWrite(0, LOW);
+  digitalWrite(1, LOW);
 }
 
 void Controller::Update()

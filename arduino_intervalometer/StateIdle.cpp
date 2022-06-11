@@ -132,6 +132,8 @@ void StateIdle::HandleEncoder(EncoderButton& eb)
     
     // Update Hint
 
+    _hintShowTime = millis();
+
     if(GetCurrentSelectable() == _intervalSettingsSelectable) 
     {
       strcpy(_hintString, "INTERVAL");
@@ -148,8 +150,15 @@ void StateIdle::HandleEncoder(EncoderButton& eb)
     {
       strcpy(_hintString, "SHUTTER");            
     }
+    else if(GetCurrentSelectable() == _setClockSelectable)
+    {
+      strcpy(_hintString, "SET CLOCK");            
+    }
+    else if(GetCurrentSelectable() == _beginSelectable)
+    {
+      _hintShowTime = 0;
+    }    
 
-    _hintShowTime = millis();
   }
 }
 
