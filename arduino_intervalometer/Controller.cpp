@@ -21,8 +21,10 @@
 #define FOCUS_PIN 12
 
 #define BATTERY_PIN A7
+#define BATTERY_READ_INTERVAL 50
 
 #define WAKE_UP_INPUT_DELAY 200
+
 
 volatile bool Controller::_discardInterrupts = false;
 
@@ -103,8 +105,6 @@ Controller::Controller()
   _isDisplayOn = true;
   _isAsleep = false;
   _redrawRequired = false;
-
-  //_batteryVoltage = CircularBuffer(32);
 
   UpdateLedState();
 }
@@ -238,8 +238,6 @@ void Controller::SetFocus(bool isPressed)
   digitalWrite(FOCUS_PIN, isPressed ? LOW : HIGH);
 }
 
-
-
 void Controller::GenerateTimeString(char* destination, uint8_t hours, uint8_t minutes, uint8_t seconds)
 {
 
@@ -370,12 +368,15 @@ void Controller::UpdateLedState()
 
 void Controller::UpdateBatteryVoltage()
 {
-  float voltage = analogRead(BATTERY_PIN);
-  voltage *= 2;    // we divided by 2, so multiply back
-  voltage *= 3.3;  // Multiply by 3.3V, our reference voltage
-  voltage /= 1024; // convert to voltage
+  if(millis() - _lastBatteryReadTime > BATTERY_READ_INTERVAL)
+  {
+    float voltage = analogRead(BATTERY_PIN);
+    voltage *= 2;    // we divided by 2, so multiply back
+    voltage *= 3.3;  // Multiply by 3.3V, our reference voltage
+    voltage /= 1024; // convert to voltage
 
-  _batteryVoltage.Add(voltage);
+    _batteryVoltage.Add(voltage);
+  }
 }
 
 float Controller::GetBatteryVoltage()

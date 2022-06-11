@@ -133,7 +133,7 @@ class Controller
 
     void UpdateLedState();
 
-    float _currentBatteryVoltage = 0.0f;
+    unsigned long _lastBatteryReadTime = 0;
     CircularBuffer _batteryVoltage = CircularBuffer(32);
 };
 
