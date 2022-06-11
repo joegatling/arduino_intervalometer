@@ -52,7 +52,9 @@ class StateIdle : public State
 
     bool ShouldShowHint();
     
-    bool _showHint = false;
+    unsigned long _hintShowTime = 0;
+    bool _isShowingHint;
+    char _hintString[16];
 
     const unsigned char* _currentBatteryIcon = NULL;
 

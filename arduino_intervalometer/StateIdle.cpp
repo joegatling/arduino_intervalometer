@@ -21,6 +21,7 @@ char StateIdle::__durationString[] = "\0";
 StateIdle::StateIdle()
 {
   strcpy(__clockString, "\0");
+  strcpy(_hintString, "\0");
 
   _beginSelectable = new Selectable(SCREEN_WIDTH, SCREEN_HEIGHT, "GO");
   _beginSelectable->SetAlignment(Selectable::BOTTOM_RIGHT);
@@ -70,10 +71,9 @@ void StateIdle::Update(bool forceRedraw)
 
   const unsigned char* batteryIcon = Controller::GetInstance()->GetBatteryIconForCurrentVoltage();  
 
-  bool shouldEraseHint = _showHint && !ShouldShowHint();
-  _showHint = ShouldShowHint();
-
-
+  bool shouldEraseHint = _isShowingHint && !ShouldShowHint();
+  _isShowingHint = ShouldShowHint();
+  
   if(UpdateAllSelectables() || _redrawRequired || shouldEraseHint || batteryIcon != _currentBatteryIcon)
   {
     _redrawRequired = false;
@@ -101,24 +101,7 @@ void StateIdle::Update(bool forceRedraw)
     if(ShouldShowHint())
     {
       display->setCursor(2, SELECTABLE_SPACING_1+4);
-
-
-      if(GetCurrentSelectable() == _intervalSettingsSelectable)
-      {
-        display->print("INTERVAL");
-      }  
-      else if(GetCurrentSelectable() == _endSettingsSelectable)
-      {
-        display->print("FRAMES");      
-      }
-      else if(GetCurrentSelectable() == _startSettingsSelectable)
-      {
-        display->print("START");            
-      }
-      else if(GetCurrentSelectable() == _shutterSettingsSelectable)
-      {
-        display->print("SHUTTER");            
-      }
+      display->print(_hintString);
     }
 
     display->fillRect(0, 0, SCREEN_WIDTH, SELECTABLE_SPACING_1, SSD1306_INVERSE);
@@ -132,7 +115,7 @@ void StateIdle::Exit()
 
 bool StateIdle::ShouldShowHint()
 { 
-  return Controller::GetInstance()->GetMillisSinceLastInput() < HINT_DURATION; 
+  return millis() - _hintShowTime < HINT_DURATION; 
 };
 
 
@@ -146,6 +129,27 @@ void StateIdle::HandleEncoder(EncoderButton& eb)
   else
   {
     IncrementCurrentSelectable(eb.increment());
+    
+    // Update Hint
+
+    if(GetCurrentSelectable() == _intervalSettingsSelectable) 
+    {
+      strcpy(_hintString, "INTERVAL");
+    }  
+    else if(GetCurrentSelectable() == _endSettingsSelectable)
+    {
+      strcpy(_hintString, "FRAMES");
+    }
+    else if(GetCurrentSelectable() == _startSettingsSelectable)
+    {
+      strcpy(_hintString, "START");            
+    }
+    else if(GetCurrentSelectable() == _shutterSettingsSelectable)
+    {
+      strcpy(_hintString, "SHUTTER");            
+    }
+
+    _hintShowTime = millis();
   }
 }
 
