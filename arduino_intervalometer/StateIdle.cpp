@@ -182,7 +182,8 @@ void StateIdle::HandleClick(EncoderButton& eb)
                                           Controller::GetInstance()->GetRTC()->getMinutes());
     StateSetClock::GetInstance()->SetCanCancel(true);
 
-    Controller::GetInstance()->SetState(Controller::SET_CLOCK);
+    GetCurrentSelectable()->SetState(Selectable::SELECTED);                                                      
+    Controller::GetInstance()->SetState(Controller::SET_CLOCK, 100);
   }
   else if(GetCurrentSelectable() == _shutterSettingsSelectable)
   {
@@ -202,8 +203,9 @@ void StateIdle::HandleClick(EncoderButton& eb)
     StateSetTimeInterval::GetInstance()->SetTime(Controller::GetInstance()->GetConfig()->GetShutterHours(), 
                                                 Controller::GetInstance()->GetConfig()->GetShutterMinutes(),  
                                                 Controller::GetInstance()->GetConfig()->GetShutterSeconds());
-                                                          
-    Controller::GetInstance()->SetState(Controller::SET_TIME_INTERVAL);                                           
+
+    GetCurrentSelectable()->SetState(Selectable::SELECTED);                                                      
+    Controller::GetInstance()->SetState(Controller::SET_TIME_INTERVAL, 100);                                           
   }
   else if(GetCurrentSelectable() == _intervalSettingsSelectable)
   {
@@ -224,7 +226,8 @@ void StateIdle::HandleClick(EncoderButton& eb)
                                                 Controller::GetInstance()->GetConfig()->GetIntervalMinutes(),  
                                                 Controller::GetInstance()->GetConfig()->GetIntervalSeconds());
 
-    Controller::GetInstance()->SetState(Controller::SET_TIME_INTERVAL);                                           
+    GetCurrentSelectable()->SetState(Selectable::SELECTED);
+    Controller::GetInstance()->SetState(Controller::SET_TIME_INTERVAL, 100);                                           
   }  
   else if(GetCurrentSelectable() == _endSettingsSelectable)
   {
@@ -245,7 +248,8 @@ void StateIdle::HandleClick(EncoderButton& eb)
   }
   else if(GetCurrentSelectable() == _beginSelectable)
   {
-    Controller::GetInstance()->SetState(Controller::RUNNING);
+    _beginSelectable->SetState(Selectable::SELECTED);
+    Controller::GetInstance()->SetState(Controller::RUNNING, 200);
   }
   
 }

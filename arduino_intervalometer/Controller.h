@@ -47,6 +47,7 @@ class Controller
     void Update();
 
     void SetState(ProgramState state);
+    void SetState(ProgramState state, unsigned long delay);
     State* GetCurrentState();
 
     ProgramState GetState();
@@ -69,6 +70,8 @@ class Controller
 
     unsigned long GetMillisSinceWakeUp() { return millis() - _wakeUpTime; };
     unsigned long GetMillisInCurrentState() { return millis() - _stateEnterTime; };
+
+    unsigned long GetStateChangeDelay() { return millis() < _nextProgramStateTime ? 0 : _nextProgramStateTime - millis(); };
 
     bool GetIsAsleep() { return _isAsleep; };
     void WakeUp(bool isUserInput);
@@ -112,6 +115,7 @@ class Controller
     State* _states[STATE_COUNT];
     ProgramState _currentProgramState = NONE;
     ProgramState _nextProgramState = UNSET;
+    unsigned long _nextProgramStateTime = 0;
 
     Adafruit_SSD1306* _display;
     EncoderButton* _knob;

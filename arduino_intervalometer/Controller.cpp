@@ -150,7 +150,7 @@ void Controller::Update()
 
   UpdateBatteryVoltage();
 
-  if(_nextProgramState != Controller::UNSET)
+  if(_nextProgramState != Controller::UNSET && millis() > _nextProgramStateTime)
   {
     if(_states[_currentProgramState] != NULL)
     {
@@ -166,6 +166,7 @@ void Controller::Update()
       _states[_currentProgramState]->Enter(); 
     }
   }
+
 
   if(_states[_currentProgramState] != NULL)
   {
@@ -191,6 +192,12 @@ void Controller::SetState(Controller::ProgramState state)
   _nextProgramState = state;
 }
 
+void Controller::SetState(Controller::ProgramState state, unsigned long delay)
+{
+  _nextProgramState = state;
+  _nextProgramStateTime = millis() + delay;
+}
+
 State* Controller::GetCurrentState()
 {
   return _states[_currentProgramState];
@@ -205,7 +212,7 @@ void Controller::HandleEncoder(EncoderButton& eb)
     Controller::GetInstance()->ResetLastInputMillis();
   }
 
-  if(Controller::GetInstance()->GetMillisSinceWakeUp() > WAKE_UP_INPUT_DELAY)
+  if(Controller::GetInstance()->GetMillisSinceWakeUp() > WAKE_UP_INPUT_DELAY && Controller::GetInstance()->GetStateChangeDelay() == 0)
   {  
     if(currentState != NULL)
     {
@@ -218,7 +225,7 @@ void Controller::HandleClick(EncoderButton& eb)
 {
   Controller::GetInstance()->ResetLastInputMillis();
 
-  if(Controller::GetInstance()->GetMillisSinceWakeUp() > WAKE_UP_INPUT_DELAY)
+  if(Controller::GetInstance()->GetMillisSinceWakeUp() > WAKE_UP_INPUT_DELAY && Controller::GetInstance()->GetStateChangeDelay() == 0)
   {
     State* currentState = Controller::GetInstance()->GetCurrentState();
 
