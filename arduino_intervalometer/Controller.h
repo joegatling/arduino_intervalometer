@@ -22,6 +22,8 @@
 
 #define SLEEP_TIMEOUT 300000
 
+#define SHORT_FLASH_TIME 150
+
 class Controller 
 {
   public:
@@ -71,7 +73,7 @@ class Controller
     unsigned long GetMillisSinceWakeUp() { return millis() - _wakeUpTime; };
     unsigned long GetMillisInCurrentState() { return millis() - _stateEnterTime; };
 
-    unsigned long GetStateChangeDelay() { return millis() < _nextProgramStateTime ? 0 : _nextProgramStateTime - millis(); };
+    unsigned long GetStateChangeDelay() { return millis() > _nextProgramStateTime ? 0 : _nextProgramStateTime - millis(); };
 
     bool GetIsAsleep() { return _isAsleep; };
     void WakeUp(bool isUserInput);

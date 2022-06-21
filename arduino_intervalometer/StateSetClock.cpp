@@ -100,6 +100,9 @@ void StateSetClock::HandleClick(EncoderButton& eb)
     {
       if(GetCurrentSelectable() == _saveSelectable)
       {
+
+        GetCurrentSelectable()->SetState(Selectable::SELECTED);
+
         if(_onComplete != NULL)
         {
           _onComplete(false);
@@ -109,6 +112,8 @@ void StateSetClock::HandleClick(EncoderButton& eb)
       {
         _hours = _originalHours;
         _minutes = _originalMinutes;
+
+        GetCurrentSelectable()->SetState(Selectable::SELECTED);
 
         if(_onComplete != NULL)
         {
@@ -130,6 +135,7 @@ void StateSetClock::HandleClick(EncoderButton& eb)
       {
         GetCurrentSelectable()->SetState(Selectable::SELECTED);
       }
+
     }
   }
 

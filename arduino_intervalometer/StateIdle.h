@@ -13,7 +13,7 @@
 #include "Selectable.h"
 #include "IntervalInfo.h"
 
-#define HINT_DURATION 2000
+#define HINT_DURATION 1000
 
 class StateIdle : public State
 {

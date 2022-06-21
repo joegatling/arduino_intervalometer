@@ -31,7 +31,8 @@ StateSetStartStyle::StateSetStartStyle()
 void StateSetStartStyle::Enter()
 {
   auto config = Controller::GetInstance()->GetConfig();
-
+  
+  GetCurrentSelectable()->SetState(Selectable::FOCUSED);
   if(config->GetSessionStartStyle() == IntervalInfo::AT_TIME)
   {
     SetCurrentSelectable(_timeSelectable);
@@ -94,11 +95,11 @@ void StateSetStartStyle::HandleClick(EncoderButton& eb)
         Controller::GetInstance()->GetConfig()->SetStartTime(StateSetClock::GetInstance()->GetHours(),
                                                             StateSetClock::GetInstance()->GetMinutes());
 
-        Controller::GetInstance()->SetState(Controller::IDLE); 
+        Controller::GetInstance()->SetState(Controller::IDLE, SHORT_FLASH_TIME); 
       }
       else
       {
-        Controller::GetInstance()->SetState(Controller::SET_START_STYLE); 
+        Controller::GetInstance()->SetState(Controller::SET_START_STYLE, SHORT_FLASH_TIME); 
       }
     });
 
@@ -107,7 +108,8 @@ void StateSetStartStyle::HandleClick(EncoderButton& eb)
                                           Controller::GetInstance()->GetConfig()->GetStartTimeMinutes());
     StateSetClock::GetInstance()->SetCanCancel(true);
 
-    Controller::GetInstance()->SetState(Controller::SET_CLOCK);  
+    GetCurrentSelectable()->SetState(Selectable::SELECTED);                                                      
+    Controller::GetInstance()->SetState(Controller::SET_CLOCK, SHORT_FLASH_TIME);  
   }
   else if(GetCurrentSelectable() == _delaySelectable)
   {
@@ -121,11 +123,11 @@ void StateSetStartStyle::HandleClick(EncoderButton& eb)
                                                             StateSetTimeInterval::GetInstance()->GetMinutes(),
                                                             StateSetTimeInterval::GetInstance()->GetSeconds());
         
-        Controller::GetInstance()->SetState(Controller::IDLE);                                             
+        Controller::GetInstance()->SetState(Controller::IDLE, SHORT_FLASH_TIME);                                             
       }
       else
       {
-        Controller::GetInstance()->SetState(Controller::SET_START_STYLE);                                             
+        Controller::GetInstance()->SetState(Controller::SET_START_STYLE, SHORT_FLASH_TIME);                                             
       }
 
     });
@@ -134,12 +136,14 @@ void StateSetStartStyle::HandleClick(EncoderButton& eb)
     StateSetTimeInterval::GetInstance()->SetTime(Controller::GetInstance()->GetConfig()->GetStartDelayHours(), 
                                                 Controller::GetInstance()->GetConfig()->GetStartDelayMinutes(),  
                                                 Controller::GetInstance()->GetConfig()->GetStartDelaySeconds());
-
-    Controller::GetInstance()->SetState(Controller::SET_TIME_INTERVAL);      
+    
+    GetCurrentSelectable()->SetState(Selectable::SELECTED);                                                      
+    Controller::GetInstance()->SetState(Controller::SET_TIME_INTERVAL, SHORT_FLASH_TIME);      
   } 
   else
   {
-    Controller::GetInstance()->SetState(Controller::IDLE);  
+    GetCurrentSelectable()->SetState(Selectable::SELECTED);                                                      
+    Controller::GetInstance()->SetState(Controller::IDLE, SHORT_FLASH_TIME);  
   }
 }
 

@@ -63,6 +63,7 @@ StateIdle::StateIdle()
 void StateIdle::Enter()
 {
   _redrawRequired = true;
+  GetCurrentSelectable()->SetState(Selectable::FOCUSED);
 }
 
 void StateIdle::Update(bool forceRedraw)
@@ -100,7 +101,18 @@ void StateIdle::Update(bool forceRedraw)
 
     if(ShouldShowHint())
     {
-      display->setCursor(2, SELECTABLE_SPACING_1+4);
+      int16_t x = 2;
+      int16_t y = GetCurrentSelectable()->GetPositionY()-15;
+      int16_t  x1, y1;
+      uint16_t width, height;
+
+      display->getTextBounds(_hintString, 0, 0, &x1, &y1, &width, &height); 
+      display->fillRect(x - 1, y - 1, width + 1, height + 1, SSD1306_WHITE);   
+      display->drawRect(x - 2, y - 2, width + 3, height + 3, SSD1306_BLACK);   
+      display->fillRect(GetCurrentSelectable()->GetPositionX() + 3, y + height, 3, 15 - GetCurrentSelectable()->GetHeight(), SSD1306_BLACK);   
+      display->drawLine(GetCurrentSelectable()->GetPositionX() + 4, y + height, GetCurrentSelectable()->GetPositionX() + 4, GetCurrentSelectable()->GetPositionY(), SSD1306_WHITE);   
+      display->setCursor(x, y);
+      display->setTextColor(SSD1306_BLACK); 
       display->print(_hintString);
     }
 
@@ -174,7 +186,7 @@ void StateIdle::HandleClick(EncoderButton& eb)
         Controller::GetInstance()->GetRTC()->setMinutes(StateSetClock::GetInstance()->GetMinutes());
       }
 
-      Controller::GetInstance()->SetState(Controller::IDLE);                                             
+      Controller::GetInstance()->SetState(Controller::IDLE, SHORT_FLASH_TIME);                                             
     });
 
     StateSetClock::GetInstance()->SetTitle("SET CLOCK");
@@ -183,7 +195,7 @@ void StateIdle::HandleClick(EncoderButton& eb)
     StateSetClock::GetInstance()->SetCanCancel(true);
 
     GetCurrentSelectable()->SetState(Selectable::SELECTED);                                                      
-    Controller::GetInstance()->SetState(Controller::SET_CLOCK, 100);
+    Controller::GetInstance()->SetState(Controller::SET_CLOCK, SHORT_FLASH_TIME);
   }
   else if(GetCurrentSelectable() == _shutterSettingsSelectable)
   {
@@ -196,7 +208,7 @@ void StateIdle::HandleClick(EncoderButton& eb)
                                                           StateSetTimeInterval::GetInstance()->GetSeconds());        
       }
       
-      Controller::GetInstance()->SetState(Controller::IDLE);                                             
+      Controller::GetInstance()->SetState(Controller::IDLE, SHORT_FLASH_TIME);                                             
     });
     
     StateSetTimeInterval::GetInstance()->SetTitle("SHUTTER");
@@ -205,7 +217,7 @@ void StateIdle::HandleClick(EncoderButton& eb)
                                                 Controller::GetInstance()->GetConfig()->GetShutterSeconds());
 
     GetCurrentSelectable()->SetState(Selectable::SELECTED);                                                      
-    Controller::GetInstance()->SetState(Controller::SET_TIME_INTERVAL, 100);                                           
+    Controller::GetInstance()->SetState(Controller::SET_TIME_INTERVAL, SHORT_FLASH_TIME);                                           
   }
   else if(GetCurrentSelectable() == _intervalSettingsSelectable)
   {
@@ -218,7 +230,7 @@ void StateIdle::HandleClick(EncoderButton& eb)
                                                           StateSetTimeInterval::GetInstance()->GetSeconds());
       }
 
-      Controller::GetInstance()->SetState(Controller::IDLE);                                             
+      Controller::GetInstance()->SetState(Controller::IDLE, SHORT_FLASH_TIME);                                             
     });
 
     StateSetTimeInterval::GetInstance()->SetTitle("INTERVAL");
@@ -227,7 +239,7 @@ void StateIdle::HandleClick(EncoderButton& eb)
                                                 Controller::GetInstance()->GetConfig()->GetIntervalSeconds());
 
     GetCurrentSelectable()->SetState(Selectable::SELECTED);
-    Controller::GetInstance()->SetState(Controller::SET_TIME_INTERVAL, 100);                                           
+    Controller::GetInstance()->SetState(Controller::SET_TIME_INTERVAL, SHORT_FLASH_TIME);                                           
   }  
   else if(GetCurrentSelectable() == _endSettingsSelectable)
   {
@@ -244,12 +256,13 @@ void StateIdle::HandleClick(EncoderButton& eb)
   }
   else if(GetCurrentSelectable() == _startSettingsSelectable)
   {
-    Controller::GetInstance()->SetState(Controller::SET_START_STYLE); 
+    GetCurrentSelectable()->SetState(Selectable::SELECTED);                                                      
+    Controller::GetInstance()->SetState(Controller::SET_START_STYLE, SHORT_FLASH_TIME); 
   }
   else if(GetCurrentSelectable() == _beginSelectable)
   {
     _beginSelectable->SetState(Selectable::SELECTED);
-    Controller::GetInstance()->SetState(Controller::RUNNING, 200);
+    Controller::GetInstance()->SetState(Controller::RUNNING, SHORT_FLASH_TIME);
   }
   
 }

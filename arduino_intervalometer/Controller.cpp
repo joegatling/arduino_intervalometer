@@ -118,7 +118,7 @@ void Controller::Initialize()
     Controller::GetInstance()->GetRTC()->setHours(StateSetClock::GetInstance()->GetHours());
     Controller::GetInstance()->GetRTC()->setMinutes(StateSetClock::GetInstance()->GetMinutes());
 
-    Controller::GetInstance()->SetState(Controller::IDLE);                                             
+    Controller::GetInstance()->SetState(Controller::IDLE, SHORT_FLASH_TIME);                                             
   });
 
   StateSetClock::GetInstance()->SetTitle("CLOCK");
