@@ -99,24 +99,13 @@ void StateIdle::Update(bool forceRedraw)
     // display->print(Controller::GetInstance()->GetBatteryVoltage());
     // display->print("v");
 
+    display->fillRect(0, 0, SCREEN_WIDTH, SELECTABLE_SPACING_1, SSD1306_INVERSE);
+
     if(ShouldShowHint())
     {
-      int16_t x = 2;
-      int16_t y = GetCurrentSelectable()->GetPositionY()-15;
-      int16_t  x1, y1;
-      uint16_t width, height;
-
-      display->getTextBounds(_hintString, 0, 0, &x1, &y1, &width, &height); 
-      display->fillRect(x - 1, y - 1, width + 1, height + 1, SSD1306_WHITE);   
-      display->drawRect(x - 2, y - 2, width + 3, height + 3, SSD1306_BLACK);   
-      display->fillRect(GetCurrentSelectable()->GetPositionX() + 3, y + height, 3, 15 - GetCurrentSelectable()->GetHeight(), SSD1306_BLACK);   
-      display->drawLine(GetCurrentSelectable()->GetPositionX() + 4, y + height, GetCurrentSelectable()->GetPositionX() + 4, GetCurrentSelectable()->GetPositionY(), SSD1306_WHITE);   
-      display->setCursor(x, y);
-      display->setTextColor(SSD1306_BLACK); 
-      display->print(_hintString);
+      DrawHint(display);
     }
 
-    display->fillRect(0, 0, SCREEN_WIDTH, SELECTABLE_SPACING_1, SSD1306_INVERSE);
 
     display->display();
   }
@@ -130,6 +119,42 @@ bool StateIdle::ShouldShowHint()
   return millis() - _hintShowTime < HINT_DURATION; 
 };
 
+void StateIdle::DrawHint(Adafruit_GFX* display)
+{
+    int16_t x = 2;
+    int16_t y;
+    int16_t  x1, y1;
+    uint16_t width, height;
+
+    if(GetCurrentSelectable() == _setClockSelectable)
+    {
+      y = GetCurrentSelectable()->GetPositionY()+19;
+
+      display->getTextBounds(_hintString, 0, 0, &x1, &y1, &width, &height); 
+      x = SCREEN_WIDTH - width - 2;
+      display->fillRect(x - 1, y - 1, width + 1, height + 1, SSD1306_WHITE);   
+      display->drawRect(x - 2, y - 2, width + 3, height + 3, SSD1306_BLACK);   
+
+      display->fillRect(GetCurrentSelectable()->GetPositionX() - 8, GetCurrentSelectable()->GetPositionY() + GetCurrentSelectable()->GetHeight() - 1, 3, 19 - GetCurrentSelectable()->GetPositionY() - GetCurrentSelectable()->GetHeight() , SSD1306_BLACK);   
+      display->drawLine(GetCurrentSelectable()->GetPositionX() - 7, GetCurrentSelectable()->GetPositionY() + GetCurrentSelectable()->GetHeight() - 1, GetCurrentSelectable()->GetPositionX() - 7, y-2, SSD1306_WHITE);   
+      //display->drawLine(GetCurrentSelectable()->GetPositionX() - 4, 0, GetCurrentSelectable()->GetPositionX() - 4, 16, SSD1306_WHITE);   
+    }
+    else
+    {
+      y = GetCurrentSelectable()->GetPositionY()-15;
+
+      display->getTextBounds(_hintString, 0, 0, &x1, &y1, &width, &height); 
+      display->fillRect(x - 1, y - 1, width + 1, height + 1, SSD1306_WHITE);   
+      display->drawRect(x - 2, y - 2, width + 3, height + 3, SSD1306_BLACK);   
+
+      display->fillRect(GetCurrentSelectable()->GetPositionX() + 3, y + height, 3, 15 - GetCurrentSelectable()->GetHeight(), SSD1306_BLACK);   
+      display->drawLine(GetCurrentSelectable()->GetPositionX() + 4, y + height, GetCurrentSelectable()->GetPositionX() + 4, GetCurrentSelectable()->GetPositionY(), SSD1306_WHITE);   
+    }
+
+    display->setCursor(x, y);
+    display->setTextColor(SSD1306_BLACK); 
+    display->print(_hintString);
+}
 
 void StateIdle::HandleEncoder(EncoderButton& eb)
 {

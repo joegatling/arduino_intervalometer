@@ -13,7 +13,7 @@
 #include "Selectable.h"
 #include "IntervalInfo.h"
 
-#define HINT_DURATION 1000
+#define HINT_DURATION 1200
 
 class StateIdle : public State
 {
@@ -51,6 +51,7 @@ class StateIdle : public State
     static char* GetClockString();
 
     bool ShouldShowHint();
+    void DrawHint(Adafruit_GFX* display);
     
     unsigned long _hintShowTime = 0;
     bool _isShowingHint;
