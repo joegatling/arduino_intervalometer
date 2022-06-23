@@ -10,7 +10,9 @@
 #define Y_OFFSET 32
 
 #define MAX_LOCK_SLIDE_SPEED 6
-#define UNLOCK_TIMEOUT 500
+#define UNLOCK_CANCEL_TIMEOUT 2000
+#define UNLOCK_RETURN_TIMEOUT 500
+#define UNLOCK_HINT_TIME 1000
 
 StateRunning* StateRunning::__instance = 0;
 bool StateRunning::__refreshAllText = false;
@@ -35,16 +37,16 @@ StateRunning::StateRunning()
   _currentSubState = StateRunning::NONE;
   _nextSubState = StateRunning::UNSET;
 
-  _startSelectable = new Selectable(ICON_WIDTH + 2, Y_OFFSET, GetDelayString);
+  _startSelectable = new Selectable(ICON_WIDTH + 1, Y_OFFSET, GetDelayString);
   _startSelectable->SetAlignment(Selectable::TOP_LEFT);
 
-  _shutterSelectable = new Selectable(ICON_WIDTH + 2, Y_OFFSET + SELECTABLE_SPACING_1 * 1, GetShutterString);
+  _shutterSelectable = new Selectable(ICON_WIDTH + 1, Y_OFFSET + SELECTABLE_SPACING_1 * 1, GetShutterString);
   _shutterSelectable->SetAlignment(Selectable::TOP_LEFT);
 
-  _intervalSelectable = new Selectable(ICON_WIDTH + 2, Y_OFFSET + SELECTABLE_SPACING_1 * 2, GetIntervalString);
+  _intervalSelectable = new Selectable(ICON_WIDTH + 1, Y_OFFSET + SELECTABLE_SPACING_1 * 2, GetIntervalString);
   _intervalSelectable->SetAlignment(Selectable::TOP_LEFT);
 
-  _endSelectable = new Selectable(ICON_WIDTH + 2, Y_OFFSET + SELECTABLE_SPACING_1 * 3, GetExposuresRemainingString);
+  _endSelectable = new Selectable(ICON_WIDTH + 1, Y_OFFSET + SELECTABLE_SPACING_1 * 3, GetExposuresRemainingString);
   _endSelectable->SetAlignment(Selectable::TOP_LEFT);
 
   _clockSelectable = new Selectable(SCREEN_WIDTH-1, 1, GetClockString);
@@ -104,12 +106,18 @@ void StateRunning::Update(bool forceRedraw)
 
     display->clearDisplay();  
   
-    display->drawBitmap(0, Y_OFFSET, icon_start, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
-    display->drawBitmap(0, Y_OFFSET + SELECTABLE_SPACING_1, icon_shutter, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
-    display->drawBitmap(0, Y_OFFSET + SELECTABLE_SPACING_1*2, icon_interval, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
-    display->drawBitmap(0, Y_OFFSET + SELECTABLE_SPACING_1*3, icon_count, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
+    display->drawBitmap(1, Y_OFFSET, icon_start, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
+    display->drawBitmap(1, Y_OFFSET + SELECTABLE_SPACING_1, icon_shutter, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
+    display->drawBitmap(1, Y_OFFSET + SELECTABLE_SPACING_1*2, icon_interval, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
+    display->drawBitmap(1, Y_OFFSET + SELECTABLE_SPACING_1*3, icon_count, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
 
     DrawAllSelectables(display);
+
+    if(_selectablesForStates[_currentSubState] != NULL)
+    {        
+      auto s = _selectablesForStates[_currentSubState];
+      display->fillRect(0, s->GetPositionY(), s->GetPositionX(), s->GetHeight(), SSD1306_INVERSE);
+    }
 
     UpdateUnlock(display);
 
@@ -156,9 +164,19 @@ void StateRunning::HandleClick(EncoderButton& eb)
   if(!_isUnlocking)
   {
     _lastUnlockMillis = millis();
+    _startUnlockMillis = millis();
     _isUnlocking = true;
     _targetIconX = 0;
   }
+}
+
+float EaseInOutExpo(float t)
+{
+  if(0 < t && t < 1)
+  {
+    t = (t < 0.5f) ? pow(2, 20 * t - 10) / 2 : (2 - pow(2, -20 * t + 10)) / 2;
+  }
+  return t;
 }
 
 void StateRunning::UpdateUnlock(Adafruit_GFX* display)
@@ -195,11 +213,11 @@ void StateRunning::UpdateUnlock(Adafruit_GFX* display)
   {
     _redrawRequired = true;
 
-    if(millis() - _lastUnlockMillis > 2000)
+    if(millis() - _lastUnlockMillis > UNLOCK_CANCEL_TIMEOUT)
     {
       _isUnlocking = false;    
     }
-    else if(millis() - _lastUnlockMillis > 500)
+    else if(millis() - _lastUnlockMillis > UNLOCK_RETURN_TIMEOUT)
     {
       _targetIconX = 0;
     }
@@ -218,11 +236,16 @@ void StateRunning::UpdateUnlock(Adafruit_GFX* display)
       Controller::GetInstance()->SetState(Controller::MESSAGE);
     }
 
+    float t = (((millis() - _startUnlockMillis) % UNLOCK_HINT_TIME) / (float)UNLOCK_HINT_TIME);
+    float x0 = EaseInOutExpo(max(0, t - 0.03f)) * (SCREEN_WIDTH - 4);
+    float x1 = EaseInOutExpo(min(1, t + 0.03f)) * (SCREEN_WIDTH - 4);
+
+    display->fillRect(2 + x0, SCREEN_HEIGHT - 7, x1 - x0, 3, SSD1306_WHITE );
     display->drawRect(2, SCREEN_HEIGHT - 9, SCREEN_WIDTH - 4, 7, SSD1306_WHITE);
     display->fillRect(3, SCREEN_HEIGHT - 8, _currentIconX - 3, 5, SSD1306_WHITE);
     display->fillRect(_currentIconX, SCREEN_HEIGHT - UNLOCK_ICON_HEIGHT, UNLOCK_ICON_WIDTH, UNLOCK_ICON_HEIGHT, SSD1306_BLACK);
     display->drawBitmap(_currentIconX, SCREEN_HEIGHT - UNLOCK_ICON_HEIGHT, icon_unlocking, UNLOCK_ICON_WIDTH, UNLOCK_ICON_HEIGHT, SSD1306_WHITE);
-
+    display->drawRect(_currentIconX - 1, SCREEN_HEIGHT - UNLOCK_ICON_HEIGHT - 1, UNLOCK_ICON_WIDTH + 2, UNLOCK_ICON_HEIGHT + 2, SSD1306_BLACK);
   }
 }
 

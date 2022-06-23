@@ -30,16 +30,16 @@ StateIdle::StateIdle()
   _setClockSelectable = new Selectable(SCREEN_WIDTH-1, 1, GetClockString);
   _setClockSelectable->SetAlignment(Selectable::TOP_RIGHT);
 
-  _startSettingsSelectable = new Selectable(ICON_WIDTH + 2, Y_OFFSET, GetDelayString);
+  _startSettingsSelectable = new Selectable(ICON_WIDTH + 1, Y_OFFSET, GetDelayString);
   _startSettingsSelectable->SetAlignment(Selectable::TOP_LEFT);
 
-  _shutterSettingsSelectable = new Selectable(ICON_WIDTH + 2, Y_OFFSET + SELECTABLE_SPACING_1 * 1, GetShutterString);
+  _shutterSettingsSelectable = new Selectable(ICON_WIDTH + 1, Y_OFFSET + SELECTABLE_SPACING_1 * 1, GetShutterString);
   _shutterSettingsSelectable->SetAlignment(Selectable::TOP_LEFT);
 
-  _intervalSettingsSelectable = new Selectable(ICON_WIDTH + 2, Y_OFFSET + SELECTABLE_SPACING_1 * 2, GetIntervalString);
+  _intervalSettingsSelectable = new Selectable(ICON_WIDTH + 1, Y_OFFSET + SELECTABLE_SPACING_1 * 2, GetIntervalString);
   _intervalSettingsSelectable->SetAlignment(Selectable::TOP_LEFT);
 
-  _endSettingsSelectable = new Selectable(ICON_WIDTH + 2, Y_OFFSET + SELECTABLE_SPACING_1 * 3, GetDurationString);
+  _endSettingsSelectable = new Selectable(ICON_WIDTH + 1, Y_OFFSET + SELECTABLE_SPACING_1 * 3, GetDurationString);
   _endSettingsSelectable->SetAlignment(Selectable::TOP_LEFT);
 
   Selectable::LinkInSequence(_setClockSelectable);
@@ -88,10 +88,17 @@ void StateIdle::Update(bool forceRedraw)
 
     DrawAllSelectables(display);
 
-    display->drawBitmap(0, Y_OFFSET, icon_start, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
-    display->drawBitmap(0, Y_OFFSET + SELECTABLE_SPACING_1, icon_shutter, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
-    display->drawBitmap(0, Y_OFFSET + SELECTABLE_SPACING_1*2, icon_interval, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
-    display->drawBitmap(0, Y_OFFSET + SELECTABLE_SPACING_1*3, icon_count, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
+    display->drawBitmap(1, Y_OFFSET, icon_start, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
+    display->drawBitmap(1, Y_OFFSET + SELECTABLE_SPACING_1, icon_shutter, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
+    display->drawBitmap(1, Y_OFFSET + SELECTABLE_SPACING_1*2, icon_interval, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
+    display->drawBitmap(1, Y_OFFSET + SELECTABLE_SPACING_1*3, icon_count, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
+
+    auto s = GetCurrentSelectable();
+
+    if(s != _beginSelectable && s != _setClockSelectable)
+    {
+      display->fillRect(0, s->GetPositionY(), s->GetPositionX(), s->GetHeight(), SSD1306_INVERSE);
+    }
 
     _currentBatteryIcon = batteryIcon;
     display->drawBitmap(1,2,_currentBatteryIcon, BATTERY_ICON_WIDTH, BATTERY_ICON_HEIGHT, SSD1306_WHITE);

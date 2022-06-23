@@ -76,6 +76,7 @@ class StateRunning : public State
 
     bool _isUnlocking = false;
     unsigned long _lastUnlockMillis = 0;
+    unsigned long _startUnlockMillis = 0;
     float _currentIconX = 0;
     float _targetIconX = 0;
     bool _redrawRequired = false;
