@@ -43,8 +43,8 @@ Compatible batteries include:
 # Hardware
 - 3.5mm output (for use with a 3.5mm -> Canon C3 cable)
 - Micro USB connector (for charging and firmware updates)
-- LCD screen (64x128p)
-- Clickable knob for inpu
+- LCD screen (64x128)
+- Clickable knob for input
 - Adafruit Feather M0 controller
 
 
