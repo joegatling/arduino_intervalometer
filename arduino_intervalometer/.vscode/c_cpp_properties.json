@@ -3,11 +3,20 @@
         {
             "name": "Mac",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "~/Documents/Arduino/libraries/**",
+                "~/Library/Arduino15/packages/arduino/hardware/avr/1.8.5/libraries/**",
+                "~/Library/Arduino15/packages/arduino/hardware/avr/1.8.5/cores/arduino",
+                "~/Library/Arduino15/packages/arduino/hardware/samd/1.8.12/cores/arduino",
+                "~/Documents/Arduino/libraries/RTCZero/src",
+                "~/Documents/Arduino/libraries/FlashStorage/src",
+                "~/Library/Arduino15/packages/adafruit/hardware/samd/1.7.10/cores/arduino/avr"
             ],
-            "defines": [],
+            "defines": [
+                "ARDUINO=10813"
+            ],
             "macFrameworkPath": [],
-            "compilerPath": "/usr/local/bin/arm-none-eabi-gcc",
+            "compilerPath": "~/Library/Arduino15/packages/adafruit/tools/arm-none-eabi-gcc/9-2019q4/bin/arm-none-eabi-gcc",
             "cStandard": "gnu17",
             "cppStandard": "gnu++14",
             "intelliSenseMode": "macos-gcc-arm"
