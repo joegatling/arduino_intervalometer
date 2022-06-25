@@ -85,6 +85,7 @@ void StateRunning::Enter()
   _currentIconX = 0;
   _targetIconX = _currentIconX;
   _isUnlocking = false;
+  _didAbandonSession = false;
 
   _exposureCount = 0;
   __refreshAllText = true;
@@ -225,15 +226,18 @@ void StateRunning::UpdateUnlock(Adafruit_GFX* display)
     _currentIconX += constrain(_targetIconX - _currentIconX, -MAX_LOCK_SLIDE_SPEED, MAX_LOCK_SLIDE_SPEED);
 
     if(_currentIconX >= SCREEN_WIDTH - UNLOCK_ICON_WIDTH)
-    {    
-      auto messageState = StateMessage::GetInstance();
-      messageState->SetMessage("Session Cancelled", 2000);
-      messageState->SetCompleteCallback([](bool didCancel)
-      {      
-        Controller::GetInstance()->SetState(Controller::IDLE);                                             
-      });
+    {  
+      _didAbandonSession = true;
+      StateRunning::GetInstance()->SetSubState(StateRunning::FINISHED);
 
-      Controller::GetInstance()->SetState(Controller::MESSAGE);
+      // auto messageState = StateMessage::GetInstance();
+      // messageState->SetMessage("Session Cancelled", 2000);
+      // messageState->SetCompleteCallback([](bool didCancel)
+      // {      
+      //   Controller::GetInstance()->SetState(Controller::IDLE);                                             
+      // });
+
+      // Controller::GetInstance()->SetState(Controller::MESSAGE);
     }
 
     float t = (((millis() - _startUnlockMillis) % UNLOCK_HINT_TIME) / (float)UNLOCK_HINT_TIME);

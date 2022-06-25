@@ -43,12 +43,13 @@ class StateRunning : public State
     SubStateType GetCurrentSubStateType() { return _currentSubState; };
     SubState* GetSubState(SubStateType state);
 
-
     void SetExposureCount(unsigned int count) {_exposureCount = count;};
     unsigned int GetExposureCount() { return _exposureCount; };
     unsigned int IncrementExposureCount() { return ++_exposureCount; };
 
     static StateRunning* GetInstance() { return __instance; };
+
+    bool DidAbandonSession() { return _didAbandonSession; }; 
 
   private:
 
@@ -75,6 +76,7 @@ class StateRunning : public State
     static char __startDoneString[3];
 
     bool _isUnlocking = false;
+    bool _didAbandonSession = false;
     unsigned long _lastUnlockMillis = 0;
     unsigned long _startUnlockMillis = 0;
     float _currentIconX = 0;
