@@ -78,16 +78,16 @@ void IntervalInfo::SetInterval(uint8_t hours, uint8_t minutes, uint8_t seconds)
 //   _sessionEndStyle = IntervalInfo::TOTAL_DURATION;
 // }
 
-void IntervalInfo::SetExposureCount(int16_t count) 
+void IntervalInfo::SetExposureCount(uint16_t count) 
 { 
   //_sessionEndStyle = TOTAL_EXPOSURE_COUNT; 
 
-  _data.exposureCount = count;
+  _data.exposureCount = count ;
 
-  while(_data.exposureCount < 0)
-  {
-    _data.exposureCount += MAX_EXPOSURE_COUNT;
-  }
+  // while(_data.exposureCount < 0)
+  // {
+  //   _data.exposureCount += MAX_EXPOSURE_COUNT;
+  // }
 
   _data.exposureCount = _data.exposureCount % MAX_EXPOSURE_COUNT;
 

@@ -84,8 +84,8 @@ class Selectable
 
 
   private: 
-    unsigned int _textScale;
     int16_t _x, _y;
+    unsigned int _textScale;
     uint16_t _width, _height;
 
     bool _redrawRequired;

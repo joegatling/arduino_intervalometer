@@ -97,8 +97,8 @@ class IntervalInfo
     // void SetSessionEndStyle(SessionEndStyle endStyle) { _sessionEndStyle = endStyle; };
 
     
-    int16_t GetExposureCount() { return  _data.exposureCount; };
-    void SetExposureCount(int16_t count);
+    uint16_t GetExposureCount() { return  _data.exposureCount; };
+    void SetExposureCount(uint16_t count);
     
     //float GetTotalDuration() { return _sessionEndStyle == TOTAL_DURATION ? _totalDuration : 0; };
     //time_t GetEndDateTime() { return _endDateTime; };
@@ -114,7 +114,7 @@ class IntervalInfo
     void SetSaveData(IntervalometerSaveData data);
 
     bool GetIsSaveDataDirty() { return _isSaveDataDirty; }
-    void SetIsSaveDataDirty(bool isDirty) { _isSaveDataDirty; }
+    void SetIsSaveDataDirty(bool isDirty) { _isSaveDataDirty = isDirty; }
 
   private:
 

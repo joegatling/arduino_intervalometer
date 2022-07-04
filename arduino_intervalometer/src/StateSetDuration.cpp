@@ -59,7 +59,7 @@ void StateSetDuration::Update(bool forceRedraw)
 
     DrawAllSelectables(display);
 
-    auto config = Controller::GetInstance()->GetConfig();
+    //auto config = Controller::GetInstance()->GetConfig();
 
     // display->drawBitmap(0, _exposureCountSelectable->GetPositionY(), config->GetSessionEndStyle() == IntervalInfo::TOTAL_EXPOSURE_COUNT ? icon_true : icon_false, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);
     // display->drawBitmap(0, _totalDurationSelectable->GetPositionY(), config->GetSessionEndStyle() == IntervalInfo::TOTAL_DURATION ? icon_true : icon_false, ICON_WIDTH, ICON_HEIGHT, SSD1306_WHITE);

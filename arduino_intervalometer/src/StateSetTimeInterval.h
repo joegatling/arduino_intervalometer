@@ -44,9 +44,9 @@ class StateSetTimeInterval : public State
 
     const char* _titleText;
 
-    char _hoursText[3];
-    char _minutesText[3];
-    char _secondsText[3];
+    char _hoursText[4];
+    char _minutesText[4];
+    char _secondsText[4];
 
     uint8_t _hours = 0;
     uint8_t _minutes = 0;

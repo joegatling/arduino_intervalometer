@@ -4,7 +4,7 @@ bool State::UpdateAllSelectables()
 {
   bool redrawRequired = false;
 
-  for(int i = 0; i < _selectableCount; i++)
+  for(unsigned int i = 0; i < _selectableCount; i++)
   {
     redrawRequired |= _allSelectables[i]->Update();
   }
@@ -15,7 +15,7 @@ bool State::UpdateAllSelectables()
 
 void State::DrawAllSelectables(Adafruit_GFX* display)
 {
-  for(int i = 0; i < _selectableCount; i++)
+  for(unsigned int i = 0; i < _selectableCount; i++)
   {
     _allSelectables[i]->Draw(display);
   }

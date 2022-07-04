@@ -62,8 +62,8 @@ class StateSetClock : public State
 
     const char* _titleText;
 
-    char _clockHoursText[3];
-    char _clockMinutesText[3];
+    char _clockHoursText[4];
+    char _clockMinutesText[4];
 
     char _amPmText[3];
 

@@ -55,15 +55,27 @@ void Selectable::LoopLinkSequence()
 
 
 Selectable::Selectable(int x, int y, const char* staticLabel) 
-  :_x(x), _y(y), _previousSelectable(NULL), _nextSelectable(NULL), _dynamicLabelCallback(0), 
-  _textScale(1), _state(Selectable::NONE), _redrawRequired(true), _enabled(true)
+  :_x(x), _y(y),
+  _textScale(1),
+  _redrawRequired(true),
+  _enabled(true), 
+  _previousSelectable(NULL), 
+  _nextSelectable(NULL), 
+  _dynamicLabelCallback(0), 
+  _state(Selectable::NONE)
 {
   strcpy(_label, staticLabel);
 }
 
 Selectable::Selectable(int x, int y, dynamicLabelCallback labelCallback)
-  :_x(x), _y(y), _dynamicLabelCallback(labelCallback), _previousSelectable(NULL), _nextSelectable(NULL), 
-  _textScale(1), _state(Selectable::NONE), _redrawRequired(true), _enabled(true)
+:_x(x), _y(y),
+  _textScale(1),
+  _redrawRequired(true),
+  _enabled(true), 
+  _previousSelectable(NULL), 
+  _nextSelectable(NULL), 
+  _dynamicLabelCallback(labelCallback), 
+  _state(Selectable::NONE)
 {
   strcpy(_label, "");
 }
