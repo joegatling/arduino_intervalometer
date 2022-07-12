@@ -8,6 +8,7 @@
 #include "StateSetDuration.h"
 #include "StateSetStartStyle.h"
 #include "StateMessage.h"
+#include "Version.h"
 //#include <ArduinoLowPower.h>
 
 #define SCREEN_ADDRESS 0x3C
@@ -62,6 +63,10 @@ Controller::Controller()
 
   _display->clearDisplay();
   _display->drawBitmap(SCREEN_WIDTH / 2 - BOOT_LOGO_WIDTH/2, SCREEN_HEIGHT / 2 - BOOT_LOGO_HEIGHT / 2,  boot_logo, BOOT_LOGO_WIDTH, BOOT_LOGO_HEIGHT, SSD1306_WHITE);
+  _display->setCursor(0,SCREEN_HEIGHT-7);
+  _display->setTextColor(SSD1306_WHITE);
+  _display->print("v");
+  _display->print(VERSION);
   _display->display();
 
   

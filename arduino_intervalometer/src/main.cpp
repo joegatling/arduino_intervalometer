@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <FlashStorage.h>
 
 #include "Controller.h"
@@ -20,11 +21,14 @@ void setup()
 
 void loop() 
 {
-  Controller::GetInstance()->Update();
-
-  if(Controller::GetInstance()->GetConfig()->GetIsSaveDataDirty())
+  //if(millis() > 2000)
   {
-    save_data_storage.write(*Controller::GetInstance()->GetConfig()->GetSaveData());
-    Controller::GetInstance()->GetConfig()->SetIsSaveDataDirty(false);
+    Controller::GetInstance()->Update();
+
+    if(Controller::GetInstance()->GetConfig()->GetIsSaveDataDirty())
+    {
+      save_data_storage.write(*Controller::GetInstance()->GetConfig()->GetSaveData());
+      Controller::GetInstance()->GetConfig()->SetIsSaveDataDirty(false);
+    }
   }
 }
