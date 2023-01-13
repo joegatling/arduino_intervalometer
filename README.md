@@ -5,6 +5,12 @@ DIY Arduino intervalometer designed for use with Canon digital cameras. Unlike m
 <img src="/Media/SketchDeviceArrows.png" width="200px"><br/>
 The only input on the device is the knob. Turn to highlight options, and click to select.
 
+# How To Flash Firmware
+1. Download and install [Visual Studio Code](https://code.visualstudio.com).
+2. Install [PlatformIO](https://platformio.org/platformio-ide).
+3. Clone this repo to your computer.
+4. Open the project in Visual Studio Code and build using the icon in the status bar.
+
 # Setup Screen
 <img src="/Media/SketchScreenIdle.png" width="200px"><br/>
 The setup screen allows is where the intervalometer is configured before the session begins.
