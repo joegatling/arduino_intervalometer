@@ -1,4 +1,5 @@
 # DIY Intervalometer
+<img src="/Media/Hardware.png" width="400px"><br/>
 DIY Arduino intervalometer designed for use with Canon digital cameras. Unlike most intervalometers out there, this one has a clock in it and can be configured to start at a specific time.
 
 # How To Use
